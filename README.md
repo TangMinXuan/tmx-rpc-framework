@@ -6,3 +6,5 @@
 - 运行 example-server 模块中的 RpcServerExampleMain 启动 provider 并注册 HelloService 服务
 - 运行 example-client 模块中的 RpcClientExampleMain 启动 consumer 并尝试调用 provider 中提供的 HelloService 服务
 
+## v1.0
+实现了最基本的远程调用功能，但是是使用原始的 socket(BIO) 实现，未来的版本将使用 netty(NIO) 去实现交互
