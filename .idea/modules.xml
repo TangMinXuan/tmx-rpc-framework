@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/example-client/example-client.iml" filepath="$PROJECT_DIR$/example-client/example-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/example-interface/example-interface.iml" filepath="$PROJECT_DIR$/example-interface/example-interface.iml" />
+      <module fileurl="file://$PROJECT_DIR$/example-server/example-server.iml" filepath="$PROJECT_DIR$/example-server/example-server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rpc-framework-core/rpc-framework-core.iml" filepath="$PROJECT_DIR$/rpc-framework-core/rpc-framework-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/tmx-rpc-framework.iml" filepath="$PROJECT_DIR$/.idea/tmx-rpc-framework.iml" />
+    </modules>
+  </component>
+</project>
