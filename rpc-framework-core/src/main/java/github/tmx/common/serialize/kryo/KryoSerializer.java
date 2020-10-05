@@ -1,12 +1,12 @@
-package github.tmx.server.serialize.kryo;
+package github.tmx.common.serialize.kryo;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import github.tmx.common.RpcRequest;
 import github.tmx.common.RpcResponse;
-import github.tmx.server.serialize.SerializeException;
-import github.tmx.server.serialize.Serializer;
+import github.tmx.common.serialize.SerializeException;
+import github.tmx.common.serialize.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

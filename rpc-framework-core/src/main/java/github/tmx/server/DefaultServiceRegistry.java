@@ -10,7 +10,7 @@ public class DefaultServiceRegistry implements ServiceRegistry {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultServiceRegistry.class);
 
-    private final Map<String, Object> serviceMap = new HashMap<>();
+    private static final Map<String, Object> serviceMap = new HashMap<>();
 
     /**
      * 注册服务
@@ -22,19 +22,18 @@ public class DefaultServiceRegistry implements ServiceRegistry {
      */
     @Override
     public synchronized <T> void register(T service) {
-        String serviceName = service.getClass().getCanonicalName();
-        if (serviceMap.containsKey(serviceName)) {
-            logger.error("接口已经注册过了");
-            return;
-        }
         Class[] interfaces = service.getClass().getInterfaces();
         if (interfaces.length == 0) {
             logger.error("服务没有实现任何接口");
         }
         for (Class i : interfaces) {
+            if (serviceMap.containsKey(i.getCanonicalName())) {
+                logger.error("接口: {} 已经注册过了,不允许重复注册", i.getCanonicalName());
+                continue;
+            }
             serviceMap.put(i.getCanonicalName(), service);
+            logger.info("成功添加接口: {}", i.getCanonicalName());
         }
-        logger.info("成功添加服务: {} 接口:{}", serviceName, service.getClass().getInterfaces());
     }
 
     @Override

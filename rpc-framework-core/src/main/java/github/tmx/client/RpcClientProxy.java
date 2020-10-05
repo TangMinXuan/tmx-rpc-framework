@@ -37,7 +37,7 @@ public class RpcClientProxy implements InvocationHandler {
                 .interfaceName(method.getDeclaringClass().getName())
                 .paramTypes(method.getParameterTypes())
                 .build();
-        RpcClient rpcClient = new RpcClient();
+        BIORpcClient rpcClient = new BIORpcClient();
         return rpcClient.sendRpcRequest(rpcRequest, host, port);
     }
 }
