@@ -1,4 +1,4 @@
-package github.tmx.common.serialize;
+package github.tmx.serialize;
 
 /**
  * @author: TangMinXuan

@@ -1,10 +1,10 @@
-package github.tmx.server.netty;
+package github.tmx.transmission.netty.server;
 
 import github.tmx.common.RpcRequest;
 import github.tmx.common.RpcResponse;
-import github.tmx.server.DefaultServiceRegistry;
-import github.tmx.server.RpcRequestHandler;
-import github.tmx.server.ServiceRegistry;
+import github.tmx.registry.DefaultServiceRegistry;
+import github.tmx.registry.ServiceRegistry;
+import github.tmx.transmission.RpcRequestHandler;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -24,6 +24,11 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     private static RpcRequestHandler rpcRequestHandler = new RpcRequestHandler();
     private static ServiceRegistry serviceRegistry = new DefaultServiceRegistry();
 
+    /**
+     * ChannelHandlerContext 是当前 ChannelHandler 与其他 ChannelHandler 和 pipeline 交流的 “信使”
+     * @param ctx
+     * @param msg
+     */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         try {

@@ -1,9 +1,8 @@
 package github.tmx;
 
-import github.tmx.client.RpcClient;
-import github.tmx.client.RpcClientProxy;
-import github.tmx.client.netty.NettyRpcClient;
-import github.tmx.client.netty.NettyRpcClientProxy;
+import github.tmx.transmission.RpcClient;
+import github.tmx.transmission.netty.client.NettyRpcClient;
+import github.tmx.transmission.netty.client.NettyRpcClientProxy;
 
 /**
  * @author: TangMinXuan

@@ -1,6 +1,7 @@
-package github.tmx.client;
+package github.tmx.transmission;
 
 import github.tmx.common.RpcRequest;
+import github.tmx.transmission.socket.BIORpcClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

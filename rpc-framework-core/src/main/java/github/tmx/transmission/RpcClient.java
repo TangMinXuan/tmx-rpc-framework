@@ -1,4 +1,4 @@
-package github.tmx.client;
+package github.tmx.transmission;
 
 import github.tmx.common.RpcRequest;
 

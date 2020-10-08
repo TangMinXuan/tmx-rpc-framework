@@ -1,4 +1,4 @@
-package github.tmx.server;
+package github.tmx.registry;
 
 public interface ServiceRegistry {
 

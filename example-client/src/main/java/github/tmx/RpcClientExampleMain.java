@@ -1,6 +1,6 @@
 package github.tmx;
 
-import github.tmx.client.RpcClientProxy;
+import github.tmx.transmission.RpcClientProxy;
 
 public class RpcClientExampleMain {
 

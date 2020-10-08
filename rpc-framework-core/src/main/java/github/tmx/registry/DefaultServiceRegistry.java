@@ -1,4 +1,4 @@
-package github.tmx.server;
+package github.tmx.registry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

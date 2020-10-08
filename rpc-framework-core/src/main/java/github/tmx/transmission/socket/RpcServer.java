@@ -1,5 +1,7 @@
-package github.tmx.server;
+package github.tmx.transmission.socket;
 
+import github.tmx.registry.ServiceRegistry;
+import github.tmx.transmission.RpcRequestHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

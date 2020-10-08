@@ -1,7 +1,7 @@
 package github.tmx;
 
-import github.tmx.server.DefaultServiceRegistry;
-import github.tmx.server.RpcServer;
+import github.tmx.registry.DefaultServiceRegistry;
+import github.tmx.transmission.socket.RpcServer;
 
 public class RpcServerExampleMain {
 

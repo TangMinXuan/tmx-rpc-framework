@@ -1,4 +1,4 @@
-package github.tmx.client;
+package github.tmx.transmission.socket;
 
 import github.tmx.common.*;
 import org.slf4j.Logger;

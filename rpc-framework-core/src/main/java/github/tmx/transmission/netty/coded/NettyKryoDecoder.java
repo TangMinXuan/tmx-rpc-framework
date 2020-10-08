@@ -1,6 +1,6 @@
-package github.tmx.server.netty;
+package github.tmx.transmission.netty.coded;
 
-import github.tmx.common.serialize.Serializer;
+import github.tmx.serialize.Serializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;

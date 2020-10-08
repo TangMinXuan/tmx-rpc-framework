@@ -1,11 +1,11 @@
-package github.tmx.client.netty;
+package github.tmx.transmission.netty.client;
 
-import github.tmx.client.RpcClient;
 import github.tmx.common.RpcRequest;
 import github.tmx.common.RpcResponse;
-import github.tmx.common.serialize.kryo.KryoSerializer;
-import github.tmx.server.netty.NettyKryoDecoder;
-import github.tmx.server.netty.NettyKryoEncoder;
+import github.tmx.serialize.kryo.KryoSerializer;
+import github.tmx.transmission.RpcClient;
+import github.tmx.transmission.netty.coded.NettyKryoDecoder;
+import github.tmx.transmission.netty.coded.NettyKryoEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -37,8 +37,8 @@ public class NettyRpcClient implements RpcClient {
         EventLoopGroup clientGroup = new NioEventLoopGroup();
         bootstrap = new Bootstrap();
         bootstrap.group(clientGroup)
-                .channel(NioSocketChannel.class)
-                .option(ChannelOption.SO_KEEPALIVE, true)
+                .channel(NioSocketChannel.class)    // channel() 方法指定了 Channel 的实现类
+                .option(ChannelOption.SO_KEEPALIVE, true)   // 设置 ChannelOption, 其将被应用到每个新创建的 Channel 的 ChannelConfig
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {
@@ -54,7 +54,7 @@ public class NettyRpcClient implements RpcClient {
     public Object sendRpcRequest(RpcRequest rpcRequest) {
         try {
             ChannelFuture channelFuture = bootstrap.connect(host, port).sync();
-            logger.info("客户端连接  {}", host + ":" + port);
+            logger.info("客户端连接: {}", host + ":" + port);
             Channel channel = channelFuture.channel();
             if (channel != null) {
                 channel.writeAndFlush(rpcRequest).addListener(future -> {

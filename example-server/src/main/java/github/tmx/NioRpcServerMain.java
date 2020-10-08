@@ -1,7 +1,7 @@
 package github.tmx;
 
-import github.tmx.server.DefaultServiceRegistry;
-import github.tmx.server.netty.NettyRpcServer;
+import github.tmx.registry.DefaultServiceRegistry;
+import github.tmx.transmission.netty.server.NettyRpcServer;
 
 /**
  * @author: TangMinXuan
