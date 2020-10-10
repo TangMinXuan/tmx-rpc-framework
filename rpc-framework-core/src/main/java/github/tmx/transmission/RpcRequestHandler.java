@@ -1,8 +1,8 @@
 package github.tmx.transmission;
 
-import github.tmx.common.RpcRequest;
-import github.tmx.common.RpcResponse;
-import github.tmx.common.RpcResponseEnum;
+import github.tmx.common.DTO.RpcRequest;
+import github.tmx.common.DTO.RpcResponse;
+import github.tmx.common.enumeration.RpcResponseEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

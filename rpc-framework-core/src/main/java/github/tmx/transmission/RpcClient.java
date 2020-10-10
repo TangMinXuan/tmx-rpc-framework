@@ -1,6 +1,6 @@
 package github.tmx.transmission;
 
-import github.tmx.common.RpcRequest;
+import github.tmx.common.DTO.RpcRequest;
 
 /**
  * @author: TangMinXuan

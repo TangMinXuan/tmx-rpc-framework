@@ -1,5 +1,6 @@
-package github.tmx.common;
+package github.tmx.common.DTO;
 
+import github.tmx.common.enumeration.RpcResponseEnum;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,9 +14,13 @@ public class RpcResponse<T> implements Serializable {
     private String message;
     private T data;
 
-    public static <T> RpcResponse<T> success(T data) {
+    private String requestId;
+
+    public static <T> RpcResponse<T> success(T data, String requestId) {
         RpcResponse<T> response = new RpcResponse<>();
         response.setCode(RpcResponseEnum.SUCCESS.getCode());
+        response.setMessage(RpcResponseEnum.SUCCESS.getMessage());
+        response.setRequestId(requestId);
         if (null != data) {
             response.setData(data);
         }

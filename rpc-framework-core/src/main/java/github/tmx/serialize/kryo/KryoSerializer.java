@@ -3,9 +3,9 @@ package github.tmx.serialize.kryo;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import github.tmx.common.RpcRequest;
-import github.tmx.common.RpcResponse;
-import github.tmx.serialize.SerializeException;
+import github.tmx.common.DTO.RpcRequest;
+import github.tmx.common.DTO.RpcResponse;
+import github.tmx.common.exception.SerializeException;
 import github.tmx.serialize.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +58,7 @@ public class KryoSerializer implements Serializer {
             Input input = new Input(byteArrayInputStream)) {
             Kryo kryo = kryoThreadLocal.get();
             kryoThreadLocal.remove();
-            return (T) kryo.readObject(input, clazz);
+            return kryo.readObject(input, clazz);
         } catch (IOException e) {
             logger.error("反序列化时发生异常: ", e);
             throw new SerializeException("反序列化失败");

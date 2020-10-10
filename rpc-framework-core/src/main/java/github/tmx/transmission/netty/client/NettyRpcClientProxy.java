@@ -1,6 +1,6 @@
 package github.tmx.transmission.netty.client;
 
-import github.tmx.common.RpcRequest;
+import github.tmx.common.DTO.RpcRequest;
 import github.tmx.transmission.RpcClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.UUID;
 
 /**
  * @author: TangMinXuan
@@ -35,6 +36,7 @@ public class NettyRpcClientProxy implements InvocationHandler {
                 .methodName(method.getName())
                 .parameters(args)
                 .paramTypes(method.getParameterTypes())
+                .requestId(UUID.randomUUID().toString())
                 .build();
         return rpcClient.sendRpcRequest(rpcRequest);
     }

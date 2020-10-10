@@ -1,4 +1,4 @@
-package github.tmx.common;
+package github.tmx.common.enumeration;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

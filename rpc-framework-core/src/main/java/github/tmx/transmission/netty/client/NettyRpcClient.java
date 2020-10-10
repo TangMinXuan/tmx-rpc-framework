@@ -1,7 +1,8 @@
 package github.tmx.transmission.netty.client;
 
-import github.tmx.common.RpcRequest;
-import github.tmx.common.RpcResponse;
+import github.tmx.common.DTO.RpcRequest;
+import github.tmx.common.DTO.RpcResponse;
+import github.tmx.common.utils.ResponseChecker;
 import github.tmx.serialize.kryo.KryoSerializer;
 import github.tmx.transmission.RpcClient;
 import github.tmx.transmission.netty.coded.NettyKryoDecoder;
@@ -65,8 +66,12 @@ public class NettyRpcClient implements RpcClient {
                     }
                 });
                 channel.closeFuture().sync();
-                AttributeKey<RpcResponse> key = AttributeKey.valueOf("rpcResponse");
+                AttributeKey<RpcResponse> key = AttributeKey.valueOf("rpcResponse" + rpcRequest.getRequestId());
                 RpcResponse rpcResponse = channel.attr(key).get();
+
+                //检查 rpcResponse
+                ResponseChecker.check(rpcResponse, rpcRequest);
+
                 return rpcResponse.getData();
             }
         } catch (InterruptedException e) {

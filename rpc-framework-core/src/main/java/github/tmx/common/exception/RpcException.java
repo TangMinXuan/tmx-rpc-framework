@@ -1,4 +1,6 @@
-package github.tmx.common;
+package github.tmx.common.exception;
+
+import github.tmx.common.enumeration.RpcErrorMessageEnum;
 
 public class RpcException extends RuntimeException {
     public RpcException(RpcErrorMessageEnum rpcErrorMessageEnum, String detail) {

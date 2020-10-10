@@ -1,7 +1,7 @@
 package github.tmx.transmission.netty.server;
 
-import github.tmx.common.RpcRequest;
-import github.tmx.common.RpcResponse;
+import github.tmx.common.DTO.RpcRequest;
+import github.tmx.common.DTO.RpcResponse;
 import github.tmx.serialize.kryo.KryoSerializer;
 import github.tmx.transmission.netty.coded.NettyKryoDecoder;
 import github.tmx.transmission.netty.coded.NettyKryoEncoder;

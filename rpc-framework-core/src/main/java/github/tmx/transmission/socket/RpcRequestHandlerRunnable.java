@@ -1,7 +1,7 @@
 package github.tmx.transmission.socket;
 
-import github.tmx.common.RpcRequest;
-import github.tmx.common.RpcResponse;
+import github.tmx.common.DTO.RpcRequest;
+import github.tmx.common.DTO.RpcResponse;
 import github.tmx.registry.ServiceRegistry;
 import github.tmx.transmission.RpcRequestHandler;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ public class RpcRequestHandlerRunnable implements Runnable {
             String interfaceName = rpcRequest.getInterfaceName();
             Object service = serviceRegistry.getService(interfaceName);
             Object result = rpcRequestHandler.handle(rpcRequest, service);
-            objectOutputStream.writeObject(RpcResponse.success(result));
+            objectOutputStream.writeObject(RpcResponse.success(result, rpcRequest.getRequestId()));
             objectOutputStream.flush();
         } catch (IOException | ClassNotFoundException e) {
             logger.error("occur exception:", e);

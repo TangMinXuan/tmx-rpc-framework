@@ -1,7 +1,7 @@
 package github.tmx.transmission.netty.server;
 
-import github.tmx.common.RpcRequest;
-import github.tmx.common.RpcResponse;
+import github.tmx.common.DTO.RpcRequest;
+import github.tmx.common.DTO.RpcResponse;
 import github.tmx.registry.DefaultServiceRegistry;
 import github.tmx.registry.ServiceRegistry;
 import github.tmx.transmission.RpcRequestHandler;
@@ -42,7 +42,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
             Object result = rpcRequestHandler.handle(rpcRequest, serviceImpl);
             logger.info("服务器执行结果: {}", result.toString());
 
-            ChannelFuture channelFuture = ctx.writeAndFlush(RpcResponse.success(result));
+            ChannelFuture channelFuture = ctx.writeAndFlush(RpcResponse.success(result, rpcRequest.getRequestId()));
             channelFuture.addListener(ChannelFutureListener.CLOSE);     // ?
         } finally {
             ReferenceCountUtil.release(msg);       // 这里是为了避免内存泄漏

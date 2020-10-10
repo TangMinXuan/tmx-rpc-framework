@@ -1,6 +1,6 @@
 package github.tmx.transmission.netty.client;
 
-import github.tmx.common.RpcResponse;
+import github.tmx.common.DTO.RpcResponse;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.AttributeKey;
@@ -25,7 +25,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
             // 声明一个 AttributeKey 对象
             // 将服务端的返回结果保存到 AttributeMap 上，AttributeMap 可以看作是一个Channel的共享数据源
             // AttributeMap的key是AttributeKey，value是Attribute
-            AttributeKey<RpcResponse> key = AttributeKey.valueOf("rpcResponse");
+            AttributeKey<RpcResponse> key = AttributeKey.valueOf("rpcResponse" + rpcResponse.getRequestId());
             ctx.channel().attr(key).set(rpcResponse);
             ctx.channel().close();
         } finally {
