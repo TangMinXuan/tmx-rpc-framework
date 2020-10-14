@@ -1,7 +1,6 @@
-package github.tmx.transmission.netty.client;
+package github.tmx.netty.client;
 
 import github.tmx.common.DTO.RpcRequest;
-import github.tmx.transmission.RpcClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

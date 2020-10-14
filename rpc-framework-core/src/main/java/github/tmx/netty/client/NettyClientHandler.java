@@ -1,4 +1,4 @@
-package github.tmx.transmission.netty.client;
+package github.tmx.netty.client;
 
 import github.tmx.common.DTO.RpcResponse;
 import io.netty.channel.ChannelHandlerContext;

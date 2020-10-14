@@ -1,4 +1,4 @@
-package github.tmx.registry;
+package github.tmx.netty.server.provider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,9 +6,9 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DefaultServiceRegistry implements ServiceRegistry {
+public class DefaultServiceProviderImpl implements ServiceProvider {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultServiceRegistry.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultServiceProviderImpl.class);
 
     private static final Map<String, Object> serviceMap = new HashMap<>();
 
@@ -21,7 +21,7 @@ public class DefaultServiceRegistry implements ServiceRegistry {
      * @param <T>
      */
     @Override
-    public synchronized <T> void register(T service) {
+    public synchronized <T> void addProvider(T service) {
         Class[] interfaces = service.getClass().getInterfaces();
         if (interfaces.length == 0) {
             logger.error("服务没有实现任何接口");
@@ -37,7 +37,7 @@ public class DefaultServiceRegistry implements ServiceRegistry {
     }
 
     @Override
-    public Object getService(String serviceName) {
+    public Object getProvider(String serviceName) {
         Object service = serviceMap.get(serviceName);
         if (null == service) {
             logger.error("找不到服务: {}", serviceName);

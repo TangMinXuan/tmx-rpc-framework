@@ -1,4 +1,4 @@
-package github.tmx.transmission.netty.coded;
+package github.tmx.netty.coded;
 
 import github.tmx.serialize.Serializer;
 import io.netty.buffer.ByteBuf;

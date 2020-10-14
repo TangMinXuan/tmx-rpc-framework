@@ -1,10 +1,14 @@
-package github.tmx.transmission.netty.server;
+package github.tmx.netty.server;
 
 import github.tmx.common.DTO.RpcRequest;
 import github.tmx.common.DTO.RpcResponse;
+import github.tmx.netty.coded.NettyKryoDecoder;
+import github.tmx.netty.coded.NettyKryoEncoder;
+import github.tmx.netty.server.provider.DefaultServiceProviderImpl;
+import github.tmx.netty.server.provider.ServiceProvider;
+import github.tmx.registry.ServiceRegistry;
+import github.tmx.registry.ZkServiceRegistry;
 import github.tmx.serialize.kryo.KryoSerializer;
-import github.tmx.transmission.netty.coded.NettyKryoDecoder;
-import github.tmx.transmission.netty.coded.NettyKryoEncoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -16,6 +20,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetSocketAddress;
+
 /**
  * @author: TangMinXuan
  * @created: 2020/10/01 19:33
@@ -24,12 +30,18 @@ public class NettyRpcServer {
 
     private static final Logger logger = LoggerFactory.getLogger(NettyRpcServer.class);
 
-    private int port;
-    private KryoSerializer kryoSerializer;
+    private final String host;
+    private final int port;
+    private final KryoSerializer kryoSerializer;
+    private final ServiceRegistry serviceRegistry;
+    private final ServiceProvider serviceProvider;
 
-    public NettyRpcServer(int port) {
+    public NettyRpcServer(String host, int port) {
+        this.host = host;
         this.port = port;
         kryoSerializer = new KryoSerializer();
+        serviceRegistry = new ZkServiceRegistry();
+        serviceProvider = new DefaultServiceProviderImpl();
     }
 
     /**
@@ -43,10 +55,15 @@ public class NettyRpcServer {
      * 2) 每当一个客户端连接进来时，会创建新的 Channel, 这个是 【子Channel】
      * ServerBootstrap 中的 option() 和 childOption() 就是区分到底为那个 Channel 配置东西
      * 具体有哪些配置参考 ChannelConfig 的 API 文档
-     *
-     *
+     * @param interfaceImpl 接口实现类
+     * @param interfaceClass
+     * @param <T> 接口类型
      */
-    public void startUp() {
+    public <T> void startUp(T interfaceImpl, Class<T> interfaceClass) {
+        // 发布服务
+        publishService(interfaceImpl, interfaceClass);
+
+        // 启动网络通信
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         try {
@@ -61,9 +78,12 @@ public class NettyRpcServer {
                             ch.pipeline().addLast(new NettyServerHandler());
                         }
                     })
-                    .childOption(ChannelOption.TCP_NODELAY, true)   // 设置tcp缓冲区
-                    .option(ChannelOption.SO_BACKLOG, 128)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true);
+                    // TCP默认开启了 Nagle 算法，该算法的作用是尽可能的发送大数据快，减少网络传输。TCP_NODELAY 参数的作用就是控制是否启用 Nagle 算法。
+                    .childOption(ChannelOption.TCP_NODELAY, true)
+                    // 是否开启 TCP 底层心跳机制
+                    .childOption(ChannelOption.SO_KEEPALIVE, true)
+                    //表示系统用于临时存放已完成三次握手的请求的队列的最大长度,如果连接建立频繁，服务器处理创建新连接较慢，可以适当调大这个参数
+                    .option(ChannelOption.SO_BACKLOG, 128);
             ChannelFuture channelFuture = bootstrap.bind(port).sync();
             channelFuture.channel().closeFuture().sync();
         } catch (InterruptedException e) {
@@ -72,6 +92,11 @@ public class NettyRpcServer {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }
+    }
 
+    // TODO: 未来应升级为扫描注解发布
+    private <T> void publishService(T interfaceImpl, Class<T> interfaceClass) {
+        serviceProvider.addProvider(interfaceImpl);
+        serviceRegistry.registerService(interfaceClass.getCanonicalName(), new InetSocketAddress(host, port));
     }
 }

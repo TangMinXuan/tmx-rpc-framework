@@ -1,4 +1,4 @@
-package github.tmx.transmission.netty.client;
+package github.tmx.netty.client;
 
 import github.tmx.common.enumeration.RpcErrorMessageEnum;
 import github.tmx.common.exception.RpcException;
@@ -23,15 +23,15 @@ public class ChannelProvider {
     private static Bootstrap bootstrap = NettyRpcClient.getBootstrap();
     private static Channel channel = null;
 
-    private static InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1", 9999);
-
     // 最多重试次数
     private static final int MAX_RETRY_COUNT = 5;
 
-    public static Channel get() {
+    public static Channel get(InetSocketAddress inetSocketAddress) {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         try {
             connect(bootstrap, inetSocketAddress, countDownLatch);
+
+            // 这里使用 CountDownLatch 的目的是阻塞等待连接完成
             countDownLatch.await();
         } catch (InterruptedException e) {
             logger.error("occur exception when get  channel:", e);

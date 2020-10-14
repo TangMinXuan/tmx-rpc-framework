@@ -1,4 +1,4 @@
-package github.tmx.transmission;
+package github.tmx.netty.client;
 
 import github.tmx.common.DTO.RpcRequest;
 import github.tmx.common.DTO.RpcResponse;
@@ -17,7 +17,7 @@ public class RpcRequestHandler {
         Object result = null;
         try {
             result = invokeTargetMethod(rpcRequest, service);
-            logger.info("service:{} successful invoke method:{}", rpcRequest.getInterfaceName(), rpcRequest.getMethodName());
+            logger.info("成功调用接口:{} 方法:{}", rpcRequest.getInterfaceName(), rpcRequest.getMethodName());
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             logger.error("occur exception", e);
         }

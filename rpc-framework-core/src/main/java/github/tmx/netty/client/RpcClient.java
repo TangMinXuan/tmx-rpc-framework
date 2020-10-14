@@ -1,4 +1,4 @@
-package github.tmx.transmission;
+package github.tmx.netty.client;
 
 import github.tmx.common.DTO.RpcRequest;
 

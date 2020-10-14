@@ -1,7 +1,6 @@
 package github.tmx;
 
-import github.tmx.registry.DefaultServiceRegistry;
-import github.tmx.transmission.netty.server.NettyRpcServer;
+import github.tmx.netty.server.NettyRpcServer;
 
 /**
  * @author: TangMinXuan
@@ -10,11 +9,8 @@ import github.tmx.transmission.netty.server.NettyRpcServer;
 public class NioRpcServerMain {
 
     public static void main(String[] args) {
-        HelloServiceImpl helloService = new HelloServiceImpl();
-        DefaultServiceRegistry defaultServiceRegistry = new DefaultServiceRegistry();
-        // 手动注册
-        defaultServiceRegistry.register(helloService);
-        NettyRpcServer socketRpcServer = new NettyRpcServer(9999);
-        socketRpcServer.startUp();
+        HelloService helloService = new HelloServiceImpl();
+        NettyRpcServer nettyRpcServer = new NettyRpcServer("127.0.0.1", 9999);
+        nettyRpcServer.startUp(helloService, HelloService.class);
     }
 }

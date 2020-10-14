@@ -1,12 +1,13 @@
-package github.tmx.transmission.netty.client;
+package github.tmx.netty.client;
 
 import github.tmx.common.DTO.RpcRequest;
 import github.tmx.common.DTO.RpcResponse;
 import github.tmx.common.utils.ResponseChecker;
+import github.tmx.netty.coded.NettyKryoDecoder;
+import github.tmx.netty.coded.NettyKryoEncoder;
+import github.tmx.registry.ServiceRegistry;
+import github.tmx.registry.ZkServiceRegistry;
 import github.tmx.serialize.kryo.KryoSerializer;
-import github.tmx.transmission.RpcClient;
-import github.tmx.transmission.netty.coded.NettyKryoDecoder;
-import github.tmx.transmission.netty.coded.NettyKryoEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -16,7 +17,7 @@ import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.atomic.AtomicReference;
+import java.net.InetSocketAddress;
 
 /**
  * @author: TangMinXuan
@@ -29,12 +30,17 @@ public class NettyRpcClient implements RpcClient {
     private static final EventLoopGroup eventLoopGroup;
     private static final Bootstrap bootstrap;
 
+    private static ServiceRegistry serviceRegistry;
+
     static {
         KryoSerializer kryoSerializer = new KryoSerializer();
+        serviceRegistry = new ZkServiceRegistry();
+
         eventLoopGroup = new NioEventLoopGroup();
         bootstrap = new Bootstrap();
         bootstrap.group(eventLoopGroup)
-                .channel(NioSocketChannel.class)    // channel() 方法指定了 Channel 的实现类
+                // channel() 方法指定了 Channel 的实现类
+                .channel(NioSocketChannel.class)
 
                 // 设置 ChannelOption, 其将被应用到每个新创建的 Channel 的 ChannelConfig
                 // 连接的超时时间，超过这个时间还是建立不上的话则代表连接失败
@@ -64,9 +70,13 @@ public class NettyRpcClient implements RpcClient {
 
     @Override
     public Object sendRpcRequest(RpcRequest rpcRequest) {
-        AtomicReference<Object> result = new AtomicReference<>(null);
         try {
-            Channel channel = ChannelProvider.get();
+            // 拿着接口名, 向 Zk 寻找 provider 地址
+            InetSocketAddress providerAddress = serviceRegistry.lookupService(rpcRequest.getInterfaceName());
+
+            // 带有重试机制的去连接 provider
+            Channel channel = ChannelProvider.get(providerAddress);
+
             if (channel.isActive()) {
                 channel.writeAndFlush(rpcRequest).addListener((ChannelFutureListener) future -> {
                     if (future.isSuccess()) {
@@ -80,10 +90,11 @@ public class NettyRpcClient implements RpcClient {
                 AttributeKey<RpcResponse> key = AttributeKey.valueOf("rpcResponse" + rpcRequest.getRequestId());
                 RpcResponse rpcResponse = channel.attr(key).get();
                 logger.info("客户端收到回应:{}", rpcResponse);
-                //校验 RpcResponse 和 RpcRequest
+                // 校验 RpcResponse 和 RpcRequest
                 ResponseChecker.check(rpcResponse, rpcRequest);
-                result.set(rpcResponse.getData());
+                return rpcResponse.getData();
             } else {
+                close();
                 System.exit(0);
             }
 
@@ -91,6 +102,6 @@ public class NettyRpcClient implements RpcClient {
             logger.error("客户端发送RPC请求时发生异常:", e);
         }
 
-        return result.get();
+        return null;
     }
 }
