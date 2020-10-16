@@ -24,7 +24,7 @@ public class KryoSerializer implements Serializer {
 
     // Kryo 不是线程安全的，因此使用 ThreadLocal 为每个线程分配一个 Kryo 对象
     // 一个 ThreadLocal 对象实际上是 threadLocalMap 中的一个 key ，然后每个 Thread 都有自己的 threadLocalMap
-    // TODO: 这里替换成 Kryo 推荐的 pool
+    // TODO(tmx): 这里替换成 Kryo 推荐的 pool
     private static final ThreadLocal<Kryo> kryoThreadLocal = ThreadLocal.withInitial(() -> {
         Kryo kryo = new Kryo();
         kryo.register(RpcResponse.class);
@@ -36,7 +36,7 @@ public class KryoSerializer implements Serializer {
 
     @Override
     public byte[] serialize(Object object) {
-        try(ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             Output output = new Output(byteArrayOutputStream)) {
             Kryo kryo = kryoThreadLocal.get();
             kryo.writeObject(output, object);
@@ -54,7 +54,7 @@ public class KryoSerializer implements Serializer {
 
     @Override
     public <T> T deserialize(byte[] bytes, Class<T> clazz) {
-        try(ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
             Input input = new Input(byteArrayInputStream)) {
             Kryo kryo = kryoThreadLocal.get();
             kryoThreadLocal.remove();

@@ -1,6 +1,8 @@
 package github.tmx.netty.client;
 
 import github.tmx.common.DTO.RpcRequest;
+import github.tmx.common.DTO.RpcResponse;
+import github.tmx.common.utils.ResponseChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,6 +10,9 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author: TangMinXuan
@@ -17,6 +22,7 @@ public class NettyRpcClientProxy implements InvocationHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(NettyRpcClientProxy.class);
 
+    private static final Integer INVOKE_TIME = 3;
     RpcClient rpcClient;
 
     public NettyRpcClientProxy(RpcClient rpcClient) {
@@ -37,6 +43,18 @@ public class NettyRpcClientProxy implements InvocationHandler {
                 .paramTypes(method.getParameterTypes())
                 .requestId(UUID.randomUUID().toString())
                 .build();
-        return rpcClient.sendRpcRequest(rpcRequest);
+        CompletableFuture<RpcResponse> resultFuture = rpcClient.sendRpcRequest(rpcRequest);
+        // 阻塞获取 rpcResponse
+        RpcResponse rpcResponse = null;
+        try {
+            rpcResponse = resultFuture.get(INVOKE_TIME, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            logger.info("调用时间超时");
+            // 超时的情况下, 必须手动 remove 掉 key, 否则会造成泄漏
+            RpcResultFuture.remove(rpcRequest);
+        }
+
+        ResponseChecker.check(rpcResponse, rpcRequest);
+        return rpcResponse.getData();
     }
 }

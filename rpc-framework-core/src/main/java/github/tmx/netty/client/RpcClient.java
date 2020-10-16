@@ -1,6 +1,9 @@
 package github.tmx.netty.client;
 
 import github.tmx.common.DTO.RpcRequest;
+import github.tmx.common.DTO.RpcResponse;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author: TangMinXuan
@@ -8,5 +11,5 @@ import github.tmx.common.DTO.RpcRequest;
  */
 public interface RpcClient {
 
-    Object sendRpcRequest(RpcRequest rpcRequest);
+    CompletableFuture<RpcResponse> sendRpcRequest(RpcRequest rpcRequest);
 }

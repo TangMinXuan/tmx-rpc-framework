@@ -2,7 +2,6 @@ package github.tmx.netty.client;
 
 import github.tmx.common.DTO.RpcRequest;
 import github.tmx.common.DTO.RpcResponse;
-import github.tmx.common.utils.ResponseChecker;
 import github.tmx.netty.coded.NettyKryoDecoder;
 import github.tmx.netty.coded.NettyKryoEncoder;
 import github.tmx.registry.ServiceRegistry;
@@ -13,11 +12,11 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author: TangMinXuan
@@ -34,6 +33,8 @@ public class NettyRpcClient implements RpcClient {
 
     static {
         KryoSerializer kryoSerializer = new KryoSerializer();
+
+        // 初始化这个实例时会自动连接远程 Zookeeper
         serviceRegistry = new ZkServiceRegistry();
 
         eventLoopGroup = new NioEventLoopGroup();
@@ -64,44 +65,33 @@ public class NettyRpcClient implements RpcClient {
     }
 
     public static void close() {
-        logger.info("客户端关闭");
+        logger.info("主动调用close()方法, 客户端关闭");
         eventLoopGroup.shutdownGracefully();
     }
 
     @Override
-    public Object sendRpcRequest(RpcRequest rpcRequest) {
-        try {
-            // 拿着接口名, 向 Zk 寻找 provider 地址
-            InetSocketAddress providerAddress = serviceRegistry.lookupService(rpcRequest.getInterfaceName());
+    public CompletableFuture<RpcResponse> sendRpcRequest(RpcRequest rpcRequest) {
+        CompletableFuture<RpcResponse> resultFuture = new CompletableFuture<>();
 
-            // 带有重试机制的去连接 provider
-            Channel channel = ChannelProvider.get(providerAddress);
+        // 拿着接口名, 向 Zk 寻找 provider 地址
+        InetSocketAddress providerAddress = serviceRegistry.lookupService(rpcRequest.getInterfaceName());
 
-            if (channel.isActive()) {
-                channel.writeAndFlush(rpcRequest).addListener((ChannelFutureListener) future -> {
-                    if (future.isSuccess()) {
-                        logger.info("客户端发送请求: {}", rpcRequest);
-                    } else {
-                        future.channel().close();
-                        logger.error("Send failed:", future.cause());
-                    }
-                });
-                channel.closeFuture().sync();
-                AttributeKey<RpcResponse> key = AttributeKey.valueOf("rpcResponse" + rpcRequest.getRequestId());
-                RpcResponse rpcResponse = channel.attr(key).get();
-                logger.info("客户端收到回应:{}", rpcResponse);
-                // 校验 RpcResponse 和 RpcRequest
-                ResponseChecker.check(rpcResponse, rpcRequest);
-                return rpcResponse.getData();
-            } else {
-                close();
-                System.exit(0);
-            }
+        // 带有重试机制的去连接 provider
+        Channel channel = ChannelProvider.getChannel(providerAddress);
 
-        } catch (InterruptedException e) {
-            logger.error("客户端发送RPC请求时发生异常:", e);
+        RpcResultFuture.put(rpcRequest, resultFuture);
+        if (channel != null && channel.isActive()) {
+            channel.writeAndFlush(rpcRequest).addListener((ChannelFutureListener) future -> {
+                if (future.isSuccess()) {
+                    logger.info("发送请求成功: {}", rpcRequest);
+                } else {
+                    logger.error("发送请求失败: {}, 失败原因: {}", rpcRequest, future.cause());
+                }
+            });
+        } else {
+            logger.error("发送请求失败: {}, 失败原因: channel为空或者已经失效", rpcRequest);
         }
 
-        return null;
+        return resultFuture;
     }
 }

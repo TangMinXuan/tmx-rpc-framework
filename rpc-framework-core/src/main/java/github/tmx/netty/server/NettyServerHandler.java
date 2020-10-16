@@ -2,7 +2,6 @@ package github.tmx.netty.server;
 
 import github.tmx.common.DTO.RpcRequest;
 import github.tmx.common.DTO.RpcResponse;
-import github.tmx.netty.client.RpcRequestHandler;
 import github.tmx.netty.server.provider.DefaultServiceProviderImpl;
 import github.tmx.netty.server.provider.ServiceProvider;
 import io.netty.channel.ChannelFuture;
@@ -21,7 +20,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(NettyServerHandler.class);
 
-    private static RpcRequestHandler rpcRequestHandler = new RpcRequestHandler();
+    private static ReflectInvoke reflectInvoke = new ReflectInvoke();
     private static ServiceProvider serviceRegistry = new DefaultServiceProviderImpl();
 
     /**
@@ -39,7 +38,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
             // 执行具体的接口逻辑
             String requestInterfaceName = rpcRequest.getInterfaceName();
             Object serviceImpl = serviceRegistry.getProvider(requestInterfaceName);
-            Object result = rpcRequestHandler.handle(rpcRequest, serviceImpl);
+            Object result = reflectInvoke.invokeTargetMethod(rpcRequest, serviceImpl);
             logger.info("服务器执行结果: {}", result.toString());
 
             ChannelFuture channelFuture = ctx.writeAndFlush(RpcResponse.success(result, rpcRequest.getRequestId()));

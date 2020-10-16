@@ -94,7 +94,7 @@ public class NettyRpcServer {
         }
     }
 
-    // TODO: 未来应升级为扫描注解发布
+    // TODO(tmx): 未来应升级为扫描注解发布
     private <T> void publishService(T interfaceImpl, Class<T> interfaceClass) {
         serviceProvider.addProvider(interfaceImpl);
         serviceRegistry.registerService(interfaceClass.getCanonicalName(), new InetSocketAddress(host, port));

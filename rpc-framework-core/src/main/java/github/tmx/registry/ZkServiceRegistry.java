@@ -37,7 +37,7 @@ public class ZkServiceRegistry implements ServiceRegistry{
     @Override
     public InetSocketAddress lookupService(String interfaceName) {
         // 默认选择 providerList 中的第一个地址
-        // TODO: 尝试模仿 Dubbo 的负载均衡
+        // TODO(tmx): 尝试模仿 Dubbo 的负载均衡
         String serviceAddress = CuratorUtil.getChildrenNodes(zkClient, interfaceName).get(0);
 
         logger.info("成功找到服务地址:{}", serviceAddress);
