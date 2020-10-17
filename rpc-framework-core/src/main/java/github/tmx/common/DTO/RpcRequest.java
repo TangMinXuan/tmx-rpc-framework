@@ -1,5 +1,6 @@
 package github.tmx.common.DTO;
 
+import github.tmx.common.enumeration.RpcMessageTypeEnum;
 import lombok.*;
 
 import java.io.Serializable;
@@ -19,5 +20,7 @@ public class RpcRequest implements Serializable {
     private String methodName;
     private Object[] parameters;
     private Class<?>[] paramTypes;
+
+    private RpcMessageTypeEnum messageTypeEnum;
 
 }

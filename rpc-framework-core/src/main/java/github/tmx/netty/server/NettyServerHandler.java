@@ -41,8 +41,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
             Object result = reflectInvoke.invokeTargetMethod(rpcRequest, serviceImpl);
             logger.info("服务器执行结果: {}", result.toString());
 
-            ChannelFuture channelFuture = ctx.writeAndFlush(RpcResponse.success(result, rpcRequest.getRequestId()));
-            channelFuture.addListener(ChannelFutureListener.CLOSE);     // ?
+            ChannelFuture channelFuture = ctx.writeAndFlush(RpcResponse.success(result, rpcRequest.getRequestId(), false));
+            channelFuture.addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
         } finally {
             ReferenceCountUtil.release(msg);       // 这里是为了避免内存泄漏
         }

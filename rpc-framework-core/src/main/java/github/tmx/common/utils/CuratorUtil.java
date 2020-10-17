@@ -54,9 +54,11 @@ public class CuratorUtil {
      */
     public static void createEphemeralNode(final CuratorFramework zkClient, final String path) {
         try {
+            // 如果子节点已经存在了, 下面这条语句会报错, 然后就不去创建子节点了
+            // 这种情况发生在, 刚断开和 ZK 的连接, ZK还来不及删临时节点, 又重新连接 ZK 了
             zkClient.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path);
         } catch (Exception e) {
-            logger.error("occur exception:", e);
+            logger.error("发生异常: ", e);
         }
     }
 

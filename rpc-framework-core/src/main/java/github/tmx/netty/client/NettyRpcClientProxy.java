@@ -2,6 +2,7 @@ package github.tmx.netty.client;
 
 import github.tmx.common.DTO.RpcRequest;
 import github.tmx.common.DTO.RpcResponse;
+import github.tmx.common.enumeration.RpcMessageTypeEnum;
 import github.tmx.common.utils.ResponseChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,7 @@ public class NettyRpcClientProxy implements InvocationHandler {
                 .parameters(args)
                 .paramTypes(method.getParameterTypes())
                 .requestId(UUID.randomUUID().toString())
+                .messageTypeEnum(RpcMessageTypeEnum.RPC_REQUEST)
                 .build();
         CompletableFuture<RpcResponse> resultFuture = rpcClient.sendRpcRequest(rpcRequest);
         // 阻塞获取 rpcResponse

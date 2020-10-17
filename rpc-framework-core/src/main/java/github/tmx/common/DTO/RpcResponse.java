@@ -1,5 +1,6 @@
 package github.tmx.common.DTO;
 
+import github.tmx.common.enumeration.RpcMessageTypeEnum;
 import github.tmx.common.enumeration.RpcResponseEnum;
 import lombok.Data;
 
@@ -16,13 +17,20 @@ public class RpcResponse<T> implements Serializable {
 
     private String requestId;
 
-    public static <T> RpcResponse<T> success(T data, String requestId) {
+    private RpcMessageTypeEnum messageTypeEnum;
+
+    public static <T> RpcResponse<T> success(T data, String requestId, boolean isHeartBeat) {
         RpcResponse<T> response = new RpcResponse<>();
         response.setCode(RpcResponseEnum.SUCCESS.getCode());
         response.setMessage(RpcResponseEnum.SUCCESS.getMessage());
         response.setRequestId(requestId);
         if (null != data) {
             response.setData(data);
+        }
+        if (isHeartBeat) {
+            response.setMessageTypeEnum(RpcMessageTypeEnum.HEART_BEAT_PONG);
+        } else {
+            response.setMessageTypeEnum(RpcMessageTypeEnum.RPC_REQUEST);
         }
         return response;
     }
