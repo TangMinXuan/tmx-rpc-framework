@@ -35,10 +35,13 @@ public class RpcResponse<T> implements Serializable {
         return response;
     }
 
-    public static <T> RpcResponse<T> fail(RpcResponseEnum RpcConstant) {
+    public static <T> RpcResponse<T> fail(String requestId, RpcResponseEnum RpcConstant) {
         RpcResponse<T> response = new RpcResponse<>();
+        response.setRequestId(requestId);
         response.setCode(RpcConstant.getCode());
         response.setMessage(RpcConstant.getMessage());
+        response.setData(null);
+        response.setMessageTypeEnum(RpcMessageTypeEnum.RPC_REQUEST);
         return response;
     }
 

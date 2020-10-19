@@ -3,15 +3,14 @@ package github.tmx.netty.client;
 import github.tmx.common.DTO.RpcRequest;
 import github.tmx.common.DTO.RpcResponse;
 import github.tmx.common.enumeration.RpcMessageTypeEnum;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.*;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetSocketAddress;
 import java.util.UUID;
 
 /**
@@ -21,6 +20,8 @@ import java.util.UUID;
 public class ClientHeartBeatHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientHeartBeatHandler.class);
+
+    private static final Integer PING_threshold = 10;
 
     /**
      * 如果是 RPC 请求的回应消息, 直接放行
@@ -50,22 +51,53 @@ public class ClientHeartBeatHandler extends ChannelInboundHandlerAdapter {
         if (evt instanceof IdleStateEvent) {
             IdleState state = ((IdleStateEvent) evt).state();
             if (state == IdleState.WRITER_IDLE) {
+                // 触发 写事件 说明, 客户端有一段时间没有发送RPC请求了, 此时发送PING请求维持连接
                 logger.info("客户端触发了 写事件 , 即将发送 PING 请求");
+                if (isPINGReached(ctx.channel())) {
+                    ctx.close();
+                }
                 RpcRequest rpcRequest = RpcRequest.builder()
                         .requestId(UUID.randomUUID().toString())
                         .messageTypeEnum(RpcMessageTypeEnum.HEART_BEAT_PING)
                         .build();
                 ChannelFuture channelFuture = ctx.writeAndFlush(rpcRequest);
                 channelFuture.addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
+            } else if (state == IdleState.READER_IDLE) {
+                // 触发 读事件 说明, 无论是RPC请求, 还是PING请求, 都未能得到服务器的响应, 此时认为服务器宕机
+                logger.info("客户端触发了 读事件 , 客户端认为服务端宕机, 主动关闭连接");
+                ctx.close();
             }
         } else {
-            super.userEventTriggered(ctx, evt);
+            // 如果不是 IdleStateEvent 就往后传, 不做处理
+            ctx.fireUserEventTriggered(evt);
         }
+    }
+
+    /**
+     * 判断在一个 channel 上发送的 PING 数量是否达到阈值
+     * @param channel
+     * @return
+     */
+    private boolean isPINGReached(Channel channel) {
+        AttributeKey<Integer> ping_count_key = AttributeKey.valueOf("ping_count");
+        if (!channel.hasAttr(ping_count_key) || channel.attr(ping_count_key).get() == null) {
+            logger.info("为首次创建的 channel 设置 PING count 数为0");
+            channel.attr(ping_count_key).set(0);
+            return false;
+        }
+        Integer count = channel.attr(ping_count_key).get();
+        channel.attr(ping_count_key).set(++count);
+        logger.info("channel Ping 数为: {}", count);
+        if (count >= PING_threshold) {
+            logger.info("达到阈值, 即将断开连接");
+            return true;
+        }
+        return false;
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         logger.info("客户端 channelInactive() 方法被触发");
-        ctx.close();
+        ChannelProvider.removeChannel((InetSocketAddress) ctx.channel().remoteAddress());
     }
 }

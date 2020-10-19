@@ -3,13 +3,16 @@ package github.tmx.netty.server.provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DefaultServiceProviderImpl implements ServiceProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultServiceProviderImpl.class);
 
+    // key-value: interfaceName-interfaceImplObject
     private static final Map<String, Object> serviceMap = new HashMap<>();
 
     /**
@@ -28,7 +31,7 @@ public class DefaultServiceProviderImpl implements ServiceProvider {
         }
         for (Class i : interfaces) {
             if (serviceMap.containsKey(i.getCanonicalName())) {
-                logger.error("接口: {} 已经注册过了,不允许重复注册", i.getCanonicalName());
+                logger.info("接口: {} 已经注册过了,不允许重复注册", i.getCanonicalName());
                 continue;
             }
             serviceMap.put(i.getCanonicalName(), service);
@@ -43,5 +46,14 @@ public class DefaultServiceProviderImpl implements ServiceProvider {
             logger.error("找不到服务: {}", serviceName);
         }
         return service;
+    }
+
+    @Override
+    public List<String> getAllService() {
+        List<String> keysList = new ArrayList<>();
+        for (String interfaceName : serviceMap.keySet()) {
+            keysList.add(interfaceName);
+        }
+        return keysList;
     }
 }

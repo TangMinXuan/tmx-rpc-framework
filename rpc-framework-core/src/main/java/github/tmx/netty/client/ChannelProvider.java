@@ -3,12 +3,16 @@ package github.tmx.netty.client;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author: TangMinXuan
@@ -18,11 +22,15 @@ public class ChannelProvider {
     private static final Logger logger = LoggerFactory.getLogger(ChannelProvider.class);
 
     private static Map<InetSocketAddress, Channel> channelCacheMap = new ConcurrentHashMap<>();
+    private static CompletableFuture<Channel> completableFuture = null;
 
-    // 最多重试次数
-    private static final int MAX_RETRY_COUNT = 3;
+    private static final int delay = 3;
 
-    public static Channel getChannel(InetSocketAddress inetSocketAddress) {
+    private ChannelProvider() {
+
+    }
+
+    public static Channel getChannel(InetSocketAddress inetSocketAddress) throws ExecutionException, InterruptedException {
         if (channelCacheMap.containsKey(inetSocketAddress)) {
             Channel channel = channelCacheMap.get(inetSocketAddress);
             if (channel != null && channel.isActive()) {
@@ -31,27 +39,29 @@ public class ChannelProvider {
                 channelCacheMap.remove(inetSocketAddress);
             }
         }
-        Channel channel = null;
-        try {
-            channel = connectWithRetryPolicy(inetSocketAddress, MAX_RETRY_COUNT);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        completableFuture = new CompletableFuture<>();
+        connectWithRetryPolicy(NettyClient.getBootstrap(), inetSocketAddress, 3);
+        Channel channel = completableFuture.get();
         channelCacheMap.put(inetSocketAddress, channel);
         return channel;
     }
 
-    private static Channel connectWithRetryPolicy(InetSocketAddress inetSocketAddress, int retryTimes) throws InterruptedException {
-        Bootstrap bootstrap = NettyRpcClient.getBootstrap();
-        for (int i = 0; i < retryTimes; i++) {
-            logger.info("第{}次连接, 此次延迟{}秒", i + 1, i);
-            Thread.sleep(i * 1000);
-            ChannelFuture future = bootstrap.connect(inetSocketAddress).sync();
-            if (future.isSuccess()) {
-                return future.channel();
+    private static void connectWithRetryPolicy(Bootstrap bootstrap, InetSocketAddress inetSocketAddress, int retryTimes) {
+        bootstrap.connect(inetSocketAddress).addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(ChannelFuture future) throws Exception {
+                if (future.isSuccess() && future.channel().isActive()) {
+                    completableFuture.complete(future.channel());
+                    return ;
+                } else {
+                    bootstrap.config().group().schedule(() ->
+                            connectWithRetryPolicy(bootstrap, inetSocketAddress, retryTimes - 1), delay, TimeUnit.SECONDS);
+                }
             }
-        }
-        logger.error("连接远程服务器失败 {}", inetSocketAddress);
-        return null;
+        });
+    }
+
+    public static void removeChannel(InetSocketAddress inetSocketAddress) {
+        channelCacheMap.remove(inetSocketAddress);
     }
 }

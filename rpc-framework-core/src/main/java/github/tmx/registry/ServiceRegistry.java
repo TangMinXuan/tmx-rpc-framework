@@ -20,6 +20,13 @@ public interface ServiceRegistry {
     void registerService(String interfaceName, InetSocketAddress inetSocketAddress);
 
     /**
+     * 注销一个服务
+     * @param interfaceName
+     * @param inetSocketAddress
+     */
+    void cancelService(String interfaceName, InetSocketAddress inetSocketAddress);
+
+    /**
      * 查找服务
      *
      * @param interfaceName 接口名
