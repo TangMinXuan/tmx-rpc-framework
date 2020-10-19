@@ -2,6 +2,7 @@ package github.tmx.netty.client;
 
 import github.tmx.common.DTO.RpcRequest;
 import github.tmx.common.DTO.RpcResponse;
+import github.tmx.common.enumeration.RpcResponseEnum;
 import github.tmx.netty.coded.NettyKryoDecoder;
 import github.tmx.netty.coded.NettyKryoEncoder;
 import github.tmx.registry.ServiceRegistry;
@@ -13,6 +14,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,9 +26,9 @@ import java.util.concurrent.TimeUnit;
  * @author: TangMinXuan
  * @created: 2020/10/05 10:19
  */
-public class NettyRpcClient implements RpcClient {
+public class NettyClient implements RpcClient {
 
-    private static final Logger logger = LoggerFactory.getLogger(NettyRpcClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(NettyClient.class);
 
     private static final EventLoopGroup eventLoopGroup;
     private static final Bootstrap bootstrap;
@@ -53,30 +55,37 @@ public class NettyRpcClient implements RpcClient {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {
-                        ch.pipeline().addLast(new IdleStateHandler(0, 5, 0, TimeUnit.SECONDS));
+                        ch.pipeline().addLast(new IdleStateHandler(10, 5, 0, TimeUnit.SECONDS));
                         ch.pipeline().addLast(new NettyKryoDecoder(kryoSerializer, RpcResponse.class));
                         ch.pipeline().addLast(new NettyKryoEncoder(kryoSerializer, RpcRequest.class));
                         ch.pipeline().addLast(new ClientHeartBeatHandler());
                         ch.pipeline().addLast(new NettyClientHandler());
                     }
                 });
+
+        // 注册一个 关闭钩子 用于 优雅停机
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            logger.info("执行优雅停机");
+            eventLoopGroup.shutdownGracefully();
+        }));
     }
 
     public static Bootstrap getBootstrap() {
         return bootstrap;
     }
 
-    public static void close() {
-        logger.info("主动调用close()方法, 客户端关闭");
-        eventLoopGroup.shutdownGracefully();
-    }
 
+    @SneakyThrows
     @Override
     public CompletableFuture<RpcResponse> sendRpcRequest(RpcRequest rpcRequest) {
         CompletableFuture<RpcResponse> resultFuture = new CompletableFuture<>();
 
         // 拿着接口名, 向 Zk 寻找 provider 地址
         InetSocketAddress providerAddress = serviceRegistry.lookupService(rpcRequest.getInterfaceName());
+        if (providerAddress == null) {
+            resultFuture.complete(RpcResponse.fail(rpcRequest.getRequestId(), RpcResponseEnum.NOT_FOUND_SERVER));
+            return resultFuture;
+        }
 
         // 带有重试机制的去连接 provider
         Channel channel = ChannelProvider.getChannel(providerAddress);

@@ -28,7 +28,7 @@ public class CuratorUtil {
     private static final int MAX_RETRIES = 3;
     private static final String CONNECT_STRING = "119.23.235.40:2181";
     private static final int CONNECTION_TIMEOUT_MS = 10 * 1000;
-    private static final int SESSION_TIMEOUT_MS = 60 * 1000;
+    private static final int SESSION_TIMEOUT_MS = 30 * 1000;
     public static final String ZK_REGISTER_ROOT_PATH = "/tmx-rpc";
 
     private static final Map<String, List<String>> serviceAddressCacheMap = new ConcurrentHashMap<>();
@@ -43,7 +43,7 @@ public class CuratorUtil {
                 .retryPolicy(retryPolicy)
                 //连接超时时间，10秒
                 .connectionTimeoutMs(CONNECTION_TIMEOUT_MS)
-                //会话超时时间，60秒
+                //会话超时时间，30秒
                 .sessionTimeoutMs(SESSION_TIMEOUT_MS)
                 .build();
     }
@@ -52,13 +52,15 @@ public class CuratorUtil {
      * 创建临时节点
      * 临时节点驻存在 ZooKeeper 中, 当 provider 和 zk 的连接断掉时被删除
      */
-    public static void createEphemeralNode(final CuratorFramework zkClient, final String path) {
+    public static void createEphemeralNode(CuratorFramework zkClient, String path) {
         try {
-            // 如果子节点已经存在了, 下面这条语句会报错, 然后就不去创建子节点了
-            // 这种情况发生在, 刚断开和 ZK 的连接, ZK还来不及删临时节点, 又重新连接 ZK 了
+            if (zkClient.checkExists().forPath(path) != null) {
+                logger.info("节点已经存在, 即将删除");
+                zkClient.delete().forPath(path);
+            }
             zkClient.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path);
         } catch (Exception e) {
-            logger.error("发生异常: ", e);
+            logger.error("创建临时节点时发生异常: ", e);
         }
     }
 
@@ -69,11 +71,12 @@ public class CuratorUtil {
      * @param serviceName
      * @return
      */
-    public static List<String> getChildrenNodes(final CuratorFramework zkClient, final String serviceName) {
+    public static List<String> getChildrenNodes(CuratorFramework zkClient, String serviceName) {
         // 先判断地址缓存中有没有需要的服务, 如果有就直接返回
         if (serviceAddressCacheMap.containsKey(serviceName)) {
             return serviceAddressCacheMap.get(serviceName);
         }
+        // 缓存中没有需要的地址, 重新去 ZK 中获取
         List<String> providerList = new ArrayList<>();
         String servicePath = CuratorUtil.ZK_REGISTER_ROOT_PATH + "/" + serviceName;
         try {
@@ -87,7 +90,7 @@ public class CuratorUtil {
     }
 
     /**
-     * 注册监听
+     * 客户端注册监听
      * 监听到子节点变化后, 更新 CacheMap
      * @param serviceName 服务名称
      */
@@ -98,13 +101,27 @@ public class CuratorUtil {
         // 添加并启动监听器, 当有事件发生时, 将会触发下面的回调函数
         PathChildrenCacheListener pathChildrenCacheListener = (curatorFramework, pathChildrenCacheEvent) -> {
             List<String> serviceAddresses = curatorFramework.getChildren().forPath(servicePath);
+            logger.info("监听到 Zookeeper 节点发生变化, 即将更新 providerList 缓存");
+            logger.info("新的 providerList 是: {}", serviceAddresses);
             serviceAddressCacheMap.put(serviceName, serviceAddresses);
         };
         pathChildrenCache.getListenable().addListener(pathChildrenCacheListener);
         try {
             pathChildrenCache.start();
         } catch (Exception e) {
-            logger.error("occur exception:", e);
+            logger.error("添加ZK节点监听器时发生异常:", e);
+        }
+    }
+
+    public static void deleteEphemeralNode(CuratorFramework zkClient, String path) {
+        try {
+            if (zkClient.checkExists().forPath(path) == null) {
+                logger.info("节点不存在, 直接返回");
+                return ;
+            }
+            zkClient.delete().forPath(path);
+        } catch (Exception e) {
+            logger.error("删除临时节点时发生异常: ", e);
         }
     }
 }

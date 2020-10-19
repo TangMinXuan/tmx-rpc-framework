@@ -17,7 +17,7 @@ public class ReflectInvoke {
         try {
             Method method = service.getClass().getMethod(rpcRequest.getMethodName(), rpcRequest.getParamTypes());
             if (null == method) {
-                return RpcResponse.fail(RpcResponseEnum.NOT_FOUND_METHOD);
+                return RpcResponse.fail(rpcRequest.getRequestId(), RpcResponseEnum.NOT_FOUND_METHOD);
             }
             return method.invoke(service, rpcRequest.getParameters());
         } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
