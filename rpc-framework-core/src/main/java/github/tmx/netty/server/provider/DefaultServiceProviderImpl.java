@@ -1,8 +1,11 @@
 package github.tmx.netty.server.provider;
 
+import github.tmx.netty.server.NettyServer;
+import github.tmx.registry.ServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,16 +18,17 @@ public class DefaultServiceProviderImpl implements ServiceProvider {
     // key-value: interfaceName-interfaceImplObject
     private static final Map<String, Object> serviceMap = new HashMap<>();
 
+    private static InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1", 9999);
+
     /**
      * 注册服务
      * 为何使用 synchronized ？
      * 考虑 2 个 provider 同时进入这个方法，且都是注册对同一个接口的实现
      *
      * @param service
-     * @param <T>
      */
     @Override
-    public synchronized <T> void addProvider(T service) {
+    public synchronized void addProvider(Object service) {
         Class[] interfaces = service.getClass().getInterfaces();
         if (interfaces.length == 0) {
             logger.error("服务没有实现任何接口");
@@ -55,5 +59,13 @@ public class DefaultServiceProviderImpl implements ServiceProvider {
             keysList.add(interfaceName);
         }
         return keysList;
+    }
+
+    @Override
+    public void publishService(Object service) {
+        addProvider(service);
+        ServiceRegistry serviceRegistry = NettyServer.getServiceRegistry();
+        Class<?> interfaceClass = service.getClass().getInterfaces()[0];
+        serviceRegistry.registerService(interfaceClass.getCanonicalName(), inetSocketAddress);
     }
 }

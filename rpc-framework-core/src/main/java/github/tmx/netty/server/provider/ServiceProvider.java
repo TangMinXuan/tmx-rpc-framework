@@ -12,4 +12,6 @@ public interface ServiceProvider {
     Object getProvider(String serviceName);
 
     List<String> getAllService();
+
+    void publishService(Object service);
 }

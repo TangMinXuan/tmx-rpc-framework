@@ -1,5 +1,8 @@
 package github.tmx;
 
+import github.tmx.spring.annotion.RpcService;
+
+@RpcService
 public class HelloServiceImpl implements HelloService {
 
     @Override

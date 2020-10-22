@@ -81,14 +81,7 @@ public class NettyServer {
         serviceProvider = new DefaultServiceProviderImpl();
     }
 
-    /**
-     * @param interfaceImpl 接口实现类
-     * @param interfaceClass
-     * @param <T> 接口类型
-     */
-    public <T> void startUp(T interfaceImpl, Class<T> interfaceClass) {
-        // 发布服务
-        publishService(interfaceImpl, interfaceClass);
+    public void startUp() {
 
         // 启动服务器
         try {
@@ -103,5 +96,9 @@ public class NettyServer {
     private <T> void publishService(T interfaceImpl, Class<T> interfaceClass) {
         serviceProvider.addProvider(interfaceImpl);
         serviceRegistry.registerService(interfaceClass.getCanonicalName(), new InetSocketAddress(host, port));
+    }
+
+    public static ServiceRegistry getServiceRegistry() {
+        return serviceRegistry;
     }
 }

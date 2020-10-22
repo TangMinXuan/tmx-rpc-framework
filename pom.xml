@@ -30,6 +30,8 @@
         <!-- test -->
         <junit.jupiter.version>5.5.2</junit.jupiter.version>
         <junit.platform.version>1.5.2</junit.platform.version>
+        <!-- Spring -->
+        <spring.version>5.2.7.RELEASE</spring.version>
     </properties>
 
     <dependencies>
@@ -119,6 +121,13 @@
                     <groupId>io.netty</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!-- Spring -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
         </dependency>
 
     </dependencies>
