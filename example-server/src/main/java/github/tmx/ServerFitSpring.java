@@ -9,12 +9,12 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
  * @author: TangMinXuan
  * @created: 2020/10/21 19:08
  */
-@EnableRPC(basePackage = {"github.tmx"})
+@EnableRPC(basePackage = {"github.tmx.impl"})
 public class ServerFitSpring {
 
     public static void main(String[] args) {
-        NettyServer nettyRpcServer = new NettyServer("127.0.0.1", 9999);
         ApplicationContext ctx = new AnnotationConfigApplicationContext(ServerFitSpring.class);
-        nettyRpcServer.startUp();
+        NettyServer nettyServer = NettyServer.getInstance();
+        nettyServer.startUp();
     }
 }

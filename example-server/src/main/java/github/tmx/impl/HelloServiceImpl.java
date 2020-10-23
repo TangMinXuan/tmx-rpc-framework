@@ -1,5 +1,7 @@
-package github.tmx;
+package github.tmx.impl;
 
+import github.tmx.Hello;
+import github.tmx.HelloService;
 import github.tmx.spring.annotion.RpcService;
 
 @RpcService

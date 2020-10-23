@@ -14,10 +14,10 @@ public interface ServiceRegistry {
      * 向 Zookeeper 注册服务
      * 目前暂不支持一个实现类实现多个接口的情况, 将来升级为扫描注解注册时会改进
      *
-     * @param interfaceName 接口名
+     * @param serviceName 接口名
      * @param inetSocketAddress 提供服务的 provider 的地址
      */
-    void registerService(String interfaceName, InetSocketAddress inetSocketAddress);
+    void registerService(String serviceName, InetSocketAddress inetSocketAddress);
 
     /**
      * 注销一个服务
@@ -25,12 +25,4 @@ public interface ServiceRegistry {
      * @param inetSocketAddress
      */
     void cancelService(String interfaceName, InetSocketAddress inetSocketAddress);
-
-    /**
-     * 查找服务
-     *
-     * @param interfaceName 接口名
-     * @return 提供服务的 provider 的地址
-     */
-    InetSocketAddress lookupService(String interfaceName);
 }

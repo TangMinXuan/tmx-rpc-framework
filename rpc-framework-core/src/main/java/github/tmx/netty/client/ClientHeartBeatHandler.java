@@ -98,6 +98,7 @@ public class ClientHeartBeatHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         logger.info("客户端 channelInactive() 方法被触发");
-        ChannelProvider.removeChannel((InetSocketAddress) ctx.channel().remoteAddress());
+        NettyClient nettyClient = NettyClient.getInstance();
+        nettyClient.removeChannel((InetSocketAddress) ctx.channel().remoteAddress());
     }
 }

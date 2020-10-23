@@ -1,11 +1,8 @@
 package github.tmx.netty.server.provider;
 
-import github.tmx.netty.server.NettyServer;
-import github.tmx.registry.ServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,36 +13,25 @@ public class DefaultServiceProviderImpl implements ServiceProvider {
     private static final Logger logger = LoggerFactory.getLogger(DefaultServiceProviderImpl.class);
 
     // key-value: interfaceName-interfaceImplObject
-    private static final Map<String, Object> serviceMap = new HashMap<>();
-
-    private static InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1", 9999);
+    private static final Map<String, Object> providerMap = new HashMap<>();
 
     /**
-     * 注册服务
-     * 为何使用 synchronized ？
-     * 考虑 2 个 provider 同时进入这个方法，且都是注册对同一个接口的实现
-     *
-     * @param service
+     * 添加服务
+     * @param serviceName
      */
     @Override
-    public synchronized void addProvider(Object service) {
-        Class[] interfaces = service.getClass().getInterfaces();
-        if (interfaces.length == 0) {
-            logger.error("服务没有实现任何接口");
+    public void addProvider(String serviceName, Object service) {
+        if (providerMap.containsKey(serviceName)) {
+            logger.info("接口: {} 已经添加过了, 不允许重复添加", serviceName);
+            return ;
         }
-        for (Class i : interfaces) {
-            if (serviceMap.containsKey(i.getCanonicalName())) {
-                logger.info("接口: {} 已经注册过了,不允许重复注册", i.getCanonicalName());
-                continue;
-            }
-            serviceMap.put(i.getCanonicalName(), service);
-            logger.info("成功添加接口: {}", i.getCanonicalName());
-        }
+        providerMap.put(serviceName, service);
+        logger.info("成功添加接口: {}", serviceName);
     }
 
     @Override
     public Object getProvider(String serviceName) {
-        Object service = serviceMap.get(serviceName);
+        Object service = providerMap.get(serviceName);
         if (null == service) {
             logger.error("找不到服务: {}", serviceName);
         }
@@ -55,17 +41,9 @@ public class DefaultServiceProviderImpl implements ServiceProvider {
     @Override
     public List<String> getAllService() {
         List<String> keysList = new ArrayList<>();
-        for (String interfaceName : serviceMap.keySet()) {
+        for (String interfaceName : providerMap.keySet()) {
             keysList.add(interfaceName);
         }
         return keysList;
-    }
-
-    @Override
-    public void publishService(Object service) {
-        addProvider(service);
-        ServiceRegistry serviceRegistry = NettyServer.getServiceRegistry();
-        Class<?> interfaceClass = service.getClass().getInterfaces()[0];
-        serviceRegistry.registerService(interfaceClass.getCanonicalName(), inetSocketAddress);
     }
 }

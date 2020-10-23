@@ -7,11 +7,9 @@ import java.util.List;
  */
 public interface ServiceProvider {
 
-    <T> void addProvider(T service);
+    void addProvider(String serviceName, Object service);
 
     Object getProvider(String serviceName);
 
     List<String> getAllService();
-
-    void publishService(Object service);
 }

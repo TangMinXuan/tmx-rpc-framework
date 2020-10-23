@@ -24,10 +24,10 @@ public class NettyRpcClientProxy implements InvocationHandler {
     private static final Logger logger = LoggerFactory.getLogger(NettyRpcClientProxy.class);
 
     private static final Integer INVOKE_TIME = 3;
-    RpcClient rpcClient;
+    private final RpcClient rpcClient;
 
-    public NettyRpcClientProxy(RpcClient rpcClient) {
-        this.rpcClient = rpcClient;
+    public NettyRpcClientProxy() {
+        rpcClient = NettyClient.getInstance();
     }
 
     public <T> T getProxyInstance(Class<T> clazz) {

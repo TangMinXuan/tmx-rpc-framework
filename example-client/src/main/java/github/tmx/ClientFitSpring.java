@@ -20,11 +20,10 @@ public class ClientFitSpring {
         ClientFitSpring clientFitSpring = ctx.getBean(ClientFitSpring.class);
         Hello hello_send = new Hello(1, "Hello, server");
         Hello hello_rec = clientFitSpring.helloService.sayHello(hello_send);
-        if (hello_rec == null) {
+        if (hello_rec != null) {
+            System.out.println("hello from client: " + "id: " + hello_rec.getId() + " " + "message: " + hello_rec.getMessage());
+        } else {
             System.out.println("RPC调用结果为null");
         }
-        System.out.println("hello from client: " +
-                "id: " + hello_rec.getId() + " " +
-                "message: " + hello_rec.getMessage());
     }
 }
