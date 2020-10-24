@@ -9,17 +9,36 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>example-server</artifactId>
+    <artifactId>example-spring-boot-provider</artifactId>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>2.2.1.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
-            <groupId>github.TangMinXuan</groupId>
-            <artifactId>example-api</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
         </dependency>
+
         <dependency>
             <groupId>github.TangMinXuan</groupId>
             <artifactId>rpc-framework-core</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>github.TangMinXuan</groupId>
+            <artifactId>example-api</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

@@ -11,8 +11,10 @@
     <modules>
         <module>rpc-framework-core</module>
         <module>example-server</module>
-        <module>example-interface</module>
+        <module>example-api</module>
         <module>example-client</module>
+        <module>example-spring-boot-consumer</module>
+        <module>example-spring-boot-provider</module>
     </modules>
 
     <properties>
