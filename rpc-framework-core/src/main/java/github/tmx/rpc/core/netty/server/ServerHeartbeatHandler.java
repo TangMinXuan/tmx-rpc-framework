@@ -17,9 +17,9 @@ import org.slf4j.LoggerFactory;
  * @author: TangMinXuan
  * @created: 2020/10/17 10:12
  */
-public class ServerHeartBeatHandler extends ChannelInboundHandlerAdapter {
+public class ServerHeartbeatHandler extends ChannelInboundHandlerAdapter {
 
-    private static final Logger logger = LoggerFactory.getLogger(ServerHeartBeatHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(ServerHeartbeatHandler.class);
 
     /**
      * 读取从客户端发来的请求,
@@ -32,7 +32,7 @@ public class ServerHeartBeatHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         RpcRequest rpcRequest = (RpcRequest) msg;
-        if (!rpcRequest.getMessageTypeEnum().equals(RpcMessageTypeEnum.HEART_BEAT_PING)) {
+        if (!rpcRequest.getMessageTypeEnum().equals(RpcMessageTypeEnum.HEARTBEAT_PING)) {
             logger.info("收到的是 RPC 请求, 直接放行");
             ctx.fireChannelRead(msg);
             return ;

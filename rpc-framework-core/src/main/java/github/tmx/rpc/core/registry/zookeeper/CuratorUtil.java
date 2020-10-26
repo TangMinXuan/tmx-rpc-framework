@@ -1,8 +1,11 @@
 package github.tmx.rpc.core.registry.zookeeper;
 
+import github.tmx.rpc.core.common.config.RpcConfig;
+import github.tmx.rpc.core.common.enumeration.RpcPropertyEnum;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.imps.CuratorFrameworkState;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.retry.RetryNTimes;
@@ -23,32 +26,33 @@ public final class CuratorUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(CuratorUtil.class);
 
-    // 连接参数
-    private static final int SLEEP_MS_BETWEEN_RETRIES = 100;
-    private static final int MAX_RETRIES = 3;
-    private static final String CONNECT_STRING = "119.23.235.40:2181";
-    private static final int CONNECTION_TIMEOUT_MS = 10 * 1000;
-    private static final int SESSION_TIMEOUT_MS = 30 * 1000;
-    public static final String ZK_REGISTER_ROOT_PATH = "/tmx-rpc";
-
     private static final Map<String, List<String>> serviceAddressCacheMap = new ConcurrentHashMap<>();
 
     private static CuratorFramework zkClient = null;
 
+    // 连接参数
+    private static int CONNECTION_TIMEOUT_MS = 10 * 1000;
+    private static int SESSION_TIMEOUT_MS = 30 * 1000;
+    public static String ROOT_PATH = RpcConfig.getProperty(RpcPropertyEnum.ZK_ROOT_PATH);
+    private static String ZK_ADDRESS = RpcConfig.getProperty(RpcPropertyEnum.ZK_ADDRESS);
+    private static int RETRY_INTERVAL = Integer.valueOf(RpcConfig.getProperty(RpcPropertyEnum.ZK_RETRY_INTERVAL));
+    private static int RETRY_COUNT = Integer.valueOf(RpcConfig.getProperty(RpcPropertyEnum.ZK_RETRY_COUNT));
+
     public static CuratorFramework getZkClient() {
-        if (zkClient == null) {
-            RetryPolicy retryPolicy = new RetryNTimes(MAX_RETRIES, SLEEP_MS_BETWEEN_RETRIES);
-            zkClient = CuratorFrameworkFactory.builder()
-                    //要连接的服务器(可以是服务器列表)
-                    .connectString(CONNECT_STRING)
-                    .retryPolicy(retryPolicy)
-                    //连接超时时间，10秒
-                    .connectionTimeoutMs(CONNECTION_TIMEOUT_MS)
-                    //会话超时时间，30秒
-                    .sessionTimeoutMs(SESSION_TIMEOUT_MS)
-                    .build();
-            zkClient.start();
+        if (zkClient != null && zkClient.getState() == CuratorFrameworkState.STARTED) {
+            return zkClient;
         }
+        RetryPolicy retryPolicy = new RetryNTimes(RETRY_COUNT, RETRY_INTERVAL);
+        zkClient = CuratorFrameworkFactory.builder()
+                //要连接的服务器(可以是服务器列表)
+                .connectString(ZK_ADDRESS)
+                .retryPolicy(retryPolicy)
+                //连接超时时间，10秒
+                .connectionTimeoutMs(CONNECTION_TIMEOUT_MS)
+                //会话超时时间，30秒
+                .sessionTimeoutMs(SESSION_TIMEOUT_MS)
+                .build();
+        zkClient.start();
         return zkClient;
     }
 
@@ -69,7 +73,7 @@ public final class CuratorUtil {
     }
 
     /**
-     * 获取某个节点下的子节点
+     * 获取某个节点下的所有子节点
      * 其中, 节点是接口名, 子节点是 实现类名 + 实现类地址
      * @param zkClient
      * @param serviceName
@@ -82,15 +86,27 @@ public final class CuratorUtil {
         }
         // 缓存中没有需要的地址, 重新去 ZK 中获取
         List<String> providerList = new ArrayList<>();
-        String servicePath = CuratorUtil.ZK_REGISTER_ROOT_PATH + "/" + serviceName;
+        String servicePath = CuratorUtil.ROOT_PATH + "/" + serviceName;
         try {
             providerList = zkClient.getChildren().forPath(servicePath);
             serviceAddressCacheMap.put(serviceName, providerList);
             registerWatcher(zkClient, serviceName);
         } catch (Exception e) {
-            logger.error("occur exception:", e);
+            logger.error("获取某个节点下的所有子节点时发生异常: ", e);
         }
         return providerList;
+    }
+
+    public static void deleteEphemeralNode(CuratorFramework zkClient, String path) {
+        try {
+            if (zkClient.checkExists().forPath(path) == null) {
+                logger.info("节点不存在, 直接返回");
+                return ;
+            }
+            zkClient.delete().forPath(path);
+        } catch (Exception e) {
+            logger.error("删除临时节点时发生异常: ", e);
+        }
     }
 
     /**
@@ -99,7 +115,7 @@ public final class CuratorUtil {
      * @param serviceName 服务名称
      */
     private static void registerWatcher(CuratorFramework zkClient, String serviceName) {
-        String servicePath = CuratorUtil.ZK_REGISTER_ROOT_PATH + "/" + serviceName;
+        String servicePath = CuratorUtil.ROOT_PATH + "/" + serviceName;
         PathChildrenCache pathChildrenCache = new PathChildrenCache(zkClient, servicePath, false);
 
         // 添加并启动监听器, 当有事件发生时, 将会触发下面的回调函数
@@ -113,19 +129,30 @@ public final class CuratorUtil {
         try {
             pathChildrenCache.start();
         } catch (Exception e) {
-            logger.error("添加ZK节点监听器时发生异常:", e);
+            logger.error("添加 Zk 节点监听器时发生异常:", e);
         }
     }
 
-    public static void deleteEphemeralNode(CuratorFramework zkClient, String path) {
-        try {
-            if (zkClient.checkExists().forPath(path) == null) {
-                logger.info("节点不存在, 直接返回");
-                return ;
+    /**
+     * 将配置 root_path 矫正为正确的格式, 例如: "tmx-rpc/" => "/tmx-rpc"
+     * 暂时不使用此方法, 应该为所有的配置项统一一个 checker
+     * @return
+     */
+    private static String correctRootPath() {
+        String read = RpcConfig.getProperty(RpcPropertyEnum.ZK_ROOT_PATH);
+        StringBuilder builder = new StringBuilder();
+        if (read.charAt(0) != '/') {
+            builder.append("/");
+            if (read.charAt(read.length() - 1) != '/') {
+                builder.append(read);
+            } else {
+                builder.append(read.toCharArray(), 0, read.length() - 1);
             }
-            zkClient.delete().forPath(path);
-        } catch (Exception e) {
-            logger.error("删除临时节点时发生异常: ", e);
+            return builder.toString();
         }
+        if (read.charAt(read.length() - 1) == '/') {
+            builder.append(read.toCharArray(), 0, read.length() - 1);
+        }
+        return builder.toString();
     }
 }

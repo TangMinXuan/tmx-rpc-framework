@@ -2,6 +2,8 @@ package github.tmx.rpc.core.netty.server;
 
 import github.tmx.rpc.core.common.DTO.RpcRequest;
 import github.tmx.rpc.core.common.DTO.RpcResponse;
+import github.tmx.rpc.core.common.config.RpcConfig;
+import github.tmx.rpc.core.common.enumeration.RpcPropertyEnum;
 import github.tmx.rpc.core.netty.coded.NettyKryoDecoder;
 import github.tmx.rpc.core.netty.coded.NettyKryoEncoder;
 import github.tmx.rpc.core.netty.server.provider.DefaultServiceProviderImpl;
@@ -20,7 +22,6 @@ import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,7 +37,8 @@ public class NettyServer {
     private ServerBootstrap bootstrap;
     private final ServiceRegistry serviceRegistry;
     private final ServiceProvider serviceProvider;
-    private final InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1", 9999);
+    private final int PORT = Integer.valueOf(RpcConfig.getProperty(RpcPropertyEnum.SERVER_PORT));
+    private final int MAX_PAUSE_TIME = Integer.valueOf(RpcConfig.getProperty(RpcPropertyEnum.SERVER_MAX_PAUSE_TIME));
 
     private NettyServer() {
         serviceRegistry = new ZkServiceRegistry();
@@ -55,10 +57,10 @@ public class NettyServer {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     public void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new IdleStateHandler(30, 0, 0, TimeUnit.SECONDS));
+                        ch.pipeline().addLast(new IdleStateHandler(MAX_PAUSE_TIME, 0, 0, TimeUnit.SECONDS));
                         ch.pipeline().addLast(new NettyKryoDecoder(kryoSerializer, RpcRequest.class));
                         ch.pipeline().addLast(new NettyKryoEncoder(kryoSerializer, RpcResponse.class));
-                        ch.pipeline().addLast(new ServerHeartBeatHandler());
+                        ch.pipeline().addLast(new ServerHeartbeatHandler());
                         ch.pipeline().addLast(new NettyServerHandler());
                     }
                 });
@@ -66,12 +68,13 @@ public class NettyServer {
         // 先注销服务, 再关闭线程池, 目的是先处理完正在进行的事件再关闭
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             logger.info("服务端执行优雅停机");
+            serviceRegistry.cancelService();
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }));
 
         // 实例化时绑定端口, 绑定后不再阻塞等待, 阻塞等待交由 Spring Boot 控制
-        bootstrap.bind(inetSocketAddress.getPort());
+        bootstrap.bind(PORT);
     }
 
     public static NettyServer getInstance() {
@@ -96,7 +99,7 @@ public class NettyServer {
         }
         for (Class i : interfaces) {
             serviceProvider.addProvider(i.getCanonicalName(), service);
-            serviceRegistry.registerService(i.getCanonicalName(), inetSocketAddress);
+            serviceRegistry.registerService(i.getCanonicalName());
         }
     }
 }

@@ -28,7 +28,7 @@ public class RpcResponse<T> implements Serializable {
             response.setData(data);
         }
         if (isHeartBeat) {
-            response.setMessageTypeEnum(RpcMessageTypeEnum.HEART_BEAT_PONG);
+            response.setMessageTypeEnum(RpcMessageTypeEnum.HEARTBEAT_PONG);
         } else {
             response.setMessageTypeEnum(RpcMessageTypeEnum.RPC_REQUEST);
         }

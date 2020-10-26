@@ -2,7 +2,9 @@ package github.tmx.rpc.core.netty.client;
 
 import github.tmx.rpc.core.common.DTO.RpcRequest;
 import github.tmx.rpc.core.common.DTO.RpcResponse;
+import github.tmx.rpc.core.common.config.RpcConfig;
 import github.tmx.rpc.core.common.enumeration.RpcMessageTypeEnum;
+import github.tmx.rpc.core.common.enumeration.RpcPropertyEnum;
 import io.netty.channel.*;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
@@ -17,11 +19,11 @@ import java.util.UUID;
  * @author: TangMinXuan
  * @created: 2020/10/17 11:14
  */
-public class ClientHeartBeatHandler extends ChannelInboundHandlerAdapter {
+public class ClientHeartbeatHandler extends ChannelInboundHandlerAdapter {
 
-    private static final Logger logger = LoggerFactory.getLogger(ClientHeartBeatHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(ClientHeartbeatHandler.class);
 
-    private static final Integer PING_threshold = 10;
+    private static Integer HEARTBEAT_THRESHOLD = Integer.valueOf(RpcConfig.getProperty(RpcPropertyEnum.CLIENT_HEARTBEAT_THRESHOLD));
 
     /**
      * 如果是 RPC 请求的回应消息, 直接放行
@@ -32,7 +34,7 @@ public class ClientHeartBeatHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         RpcResponse rpcResponse = (RpcResponse) msg;
-        if (!rpcResponse.getMessageTypeEnum().equals(RpcMessageTypeEnum.HEART_BEAT_PONG)) {
+        if (!rpcResponse.getMessageTypeEnum().equals(RpcMessageTypeEnum.HEARTBEAT_PONG)) {
             logger.info("收到的是 RPC 回应, 直接放行");
             ctx.fireChannelRead(msg);
             return ;
@@ -58,7 +60,7 @@ public class ClientHeartBeatHandler extends ChannelInboundHandlerAdapter {
                 }
                 RpcRequest rpcRequest = RpcRequest.builder()
                         .requestId(UUID.randomUUID().toString())
-                        .messageTypeEnum(RpcMessageTypeEnum.HEART_BEAT_PING)
+                        .messageTypeEnum(RpcMessageTypeEnum.HEARTBEAT_PING)
                         .build();
                 ChannelFuture channelFuture = ctx.writeAndFlush(rpcRequest);
                 channelFuture.addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
@@ -88,7 +90,7 @@ public class ClientHeartBeatHandler extends ChannelInboundHandlerAdapter {
         Integer count = channel.attr(ping_count_key).get();
         channel.attr(ping_count_key).set(++count);
         logger.info("channel Ping 数为: {}", count);
-        if (count >= PING_threshold) {
+        if (count >= HEARTBEAT_THRESHOLD) {
             logger.info("达到阈值, 即将断开连接");
             return true;
         }

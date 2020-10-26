@@ -5,7 +5,7 @@ package github.tmx.rpc.core.common.enumeration;
  * @created: 2020/10/17 10:17
  */
 public enum RpcMessageTypeEnum {
-    HEART_BEAT_PING,
-    HEART_BEAT_PONG,
+    HEARTBEAT_PING,
+    HEARTBEAT_PONG,
     RPC_REQUEST
 }

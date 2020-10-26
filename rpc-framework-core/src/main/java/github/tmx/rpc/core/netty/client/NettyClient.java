@@ -2,6 +2,8 @@ package github.tmx.rpc.core.netty.client;
 
 import github.tmx.rpc.core.common.DTO.RpcRequest;
 import github.tmx.rpc.core.common.DTO.RpcResponse;
+import github.tmx.rpc.core.common.config.RpcConfig;
+import github.tmx.rpc.core.common.enumeration.RpcPropertyEnum;
 import github.tmx.rpc.core.common.enumeration.RpcResponseEnum;
 import github.tmx.rpc.core.netty.coded.NettyKryoDecoder;
 import github.tmx.rpc.core.netty.coded.NettyKryoEncoder;
@@ -36,7 +38,12 @@ public class NettyClient implements RpcClient {
 
     private final Map<InetSocketAddress, Channel> channelCacheMap;
     private final ZkServiceDiscovery zkServiceDiscovery;
-    private final int delay = 3;
+
+    private final int RETRY_INTERVAL = Integer.valueOf(RpcConfig.getProperty(RpcPropertyEnum.CLIENT_RETRY_INTERVAL));
+    private final int RETRY_COUNT = Integer.valueOf(RpcConfig.getProperty(RpcPropertyEnum.CLIENT_RETRY_COUNT));
+    private final int PING_INTERVAL = Integer.valueOf(RpcConfig.getProperty(RpcPropertyEnum.CLIENT_PING_INTERVAL));
+    private final int MAX_PAUSE_TIME = Integer.valueOf(RpcConfig.getProperty(RpcPropertyEnum.CLIENT_MAX_PAUSE_TIME));
+
     private Bootstrap bootstrap;
 
     private NettyClient() {
@@ -57,10 +64,10 @@ public class NettyClient implements RpcClient {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {
-                        ch.pipeline().addLast(new IdleStateHandler(10, 5, 0, TimeUnit.SECONDS));
+                        ch.pipeline().addLast(new IdleStateHandler(MAX_PAUSE_TIME, PING_INTERVAL, 0, TimeUnit.SECONDS));
                         ch.pipeline().addLast(new NettyKryoDecoder(kryoSerializer, RpcResponse.class));
                         ch.pipeline().addLast(new NettyKryoEncoder(kryoSerializer, RpcRequest.class));
-                        ch.pipeline().addLast(new ClientHeartBeatHandler());
+                        ch.pipeline().addLast(new ClientHeartbeatHandler());
                         ch.pipeline().addLast(new NettyClientHandler());
                     }
                 });
@@ -129,13 +136,13 @@ public class NettyClient implements RpcClient {
             }
         }
         CompletableFuture<Channel> completableFuture = new CompletableFuture<>();
-        connectWithRetryPolicy(inetSocketAddress, 3, completableFuture);
+        connectWithRetryPolicy(inetSocketAddress, RETRY_COUNT, completableFuture);
         Channel channel = completableFuture.get();
         channelCacheMap.put(inetSocketAddress, channel);
         return channel;
     }
 
-    private void connectWithRetryPolicy(InetSocketAddress inetSocketAddress, int retryTimes,
+    private void connectWithRetryPolicy(InetSocketAddress inetSocketAddress, int retryCount,
                                         CompletableFuture<Channel> completableFuture) {
         bootstrap.connect(inetSocketAddress).addListener(new ChannelFutureListener() {
             @Override
@@ -145,8 +152,8 @@ public class NettyClient implements RpcClient {
                     return ;
                 } else {
                     bootstrap.config().group().schedule(() ->
-                            connectWithRetryPolicy(inetSocketAddress, retryTimes - 1,
-                                    completableFuture), delay, TimeUnit.SECONDS);
+                            connectWithRetryPolicy(inetSocketAddress, retryCount - 1,
+                                    completableFuture), RETRY_INTERVAL, TimeUnit.SECONDS);
                 }
             }
         });
