@@ -1,11 +1,9 @@
 package github.tmx.rpc.core.netty.server;
 
-import github.tmx.rpc.core.common.DTO.RpcRequest;
-import github.tmx.rpc.core.common.DTO.RpcResponse;
 import github.tmx.rpc.core.common.config.RpcConfig;
 import github.tmx.rpc.core.common.enumeration.RpcPropertyEnum;
-import github.tmx.rpc.core.netty.coded.NettyKryoDecoder;
-import github.tmx.rpc.core.netty.coded.NettyKryoEncoder;
+import github.tmx.rpc.core.netty.coded.RpcMsgDecoder;
+import github.tmx.rpc.core.netty.coded.RpcMsgEncoder;
 import github.tmx.rpc.core.netty.server.provider.DefaultServiceProviderImpl;
 import github.tmx.rpc.core.netty.server.provider.ServiceProvider;
 import github.tmx.rpc.core.registry.ServiceRegistry;
@@ -58,8 +56,8 @@ public class NettyServer {
                     @Override
                     public void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline().addLast(new IdleStateHandler(MAX_PAUSE_TIME, 0, 0, TimeUnit.SECONDS));
-                        ch.pipeline().addLast(new NettyKryoDecoder(kryoSerializer, RpcRequest.class));
-                        ch.pipeline().addLast(new NettyKryoEncoder(kryoSerializer, RpcResponse.class));
+                        ch.pipeline().addLast(new RpcMsgDecoder());
+                        ch.pipeline().addLast(new RpcMsgEncoder());
                         ch.pipeline().addLast(new ServerHeartbeatHandler());
                         ch.pipeline().addLast(new NettyServerHandler());
                     }
