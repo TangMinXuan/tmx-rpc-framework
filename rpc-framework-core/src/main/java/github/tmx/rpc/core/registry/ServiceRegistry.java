@@ -1,11 +1,14 @@
 package github.tmx.rpc.core.registry;
 
+import github.tmx.rpc.core.extension.SPI;
+
 /**
  * 服务注册中心接口
  *
  * @author: TangMinXuan
  * @created: 2020/10/13 15:06
  */
+@SPI
 public interface ServiceRegistry {
 
     /**

@@ -3,8 +3,8 @@ package github.tmx.rpc.core.netty.coded;
 import github.tmx.rpc.core.common.DTO.RpcProtocol;
 import github.tmx.rpc.core.common.DTO.RpcRequest;
 import github.tmx.rpc.core.common.DTO.RpcResponse;
+import github.tmx.rpc.core.extension.ExtensionLoader;
 import github.tmx.rpc.core.serialize.Serializer;
-import github.tmx.rpc.core.serialize.kryo.KryoSerializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -17,13 +17,13 @@ import java.util.List;
  * @author: TangMinXuan
  * @created: 2020/10/27 15:40
  */
-public class RpcMsgDecoder extends ByteToMessageDecoder {
+public class NettyMsgDecoder extends ByteToMessageDecoder {
 
-    private static final Logger logger = LoggerFactory.getLogger(RpcMsgDecoder.class);
+    private static final Logger logger = LoggerFactory.getLogger(NettyMsgDecoder.class);
 
     // 最短有效长度
     private static final int MINIMUM_EFFECTIVE_LENGTH = 14;
-    private Serializer serializer = new KryoSerializer();
+    private Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension("Kryo");
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {

@@ -14,11 +14,14 @@ public class RpcClientMain {
         NettyRpcClientProxy proxy = new NettyRpcClientProxy();
         HelloService helloService = proxy.getProxyInstance(HelloService.class);
         Hello hello_send = new Hello(1, "Hello, server");
-        Hello hello_rec = helloService.sayHello(hello_send);
-        if (hello_rec != null) {
-            System.out.println("hello from client: " + "id: " + hello_rec.getId() + " " + "message: " + hello_rec.getMessage());
-        } else {
-            System.out.println("RPC调用结果为null");
+
+        for (int i = 0; i < 10; i++) {
+            Hello hello_rec = helloService.sayHello(hello_send);
+            if (hello_rec != null) {
+                System.out.println("hello from client: " + "id: " + hello_rec.getId() + " " + "message: " + hello_rec.getMessage());
+            } else {
+                System.out.println("RPC调用结果为null");
+            }
         }
     }
 }

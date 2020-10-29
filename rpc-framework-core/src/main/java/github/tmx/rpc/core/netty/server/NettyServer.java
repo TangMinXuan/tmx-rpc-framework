@@ -1,14 +1,13 @@
 package github.tmx.rpc.core.netty.server;
 
-import github.tmx.rpc.core.common.config.RpcConfig;
 import github.tmx.rpc.core.common.enumeration.RpcPropertyEnum;
-import github.tmx.rpc.core.netty.coded.RpcMsgDecoder;
-import github.tmx.rpc.core.netty.coded.RpcMsgEncoder;
+import github.tmx.rpc.core.config.RpcConfig;
+import github.tmx.rpc.core.extension.ExtensionLoader;
+import github.tmx.rpc.core.netty.coded.NettyMsgDecoder;
+import github.tmx.rpc.core.netty.coded.NettyMsgEncoder;
 import github.tmx.rpc.core.netty.server.provider.DefaultServiceProviderImpl;
 import github.tmx.rpc.core.netty.server.provider.ServiceProvider;
 import github.tmx.rpc.core.registry.ServiceRegistry;
-import github.tmx.rpc.core.registry.zookeeper.ZkServiceRegistry;
-import github.tmx.rpc.core.serialize.kryo.KryoSerializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -39,9 +38,8 @@ public class NettyServer {
     private final int MAX_PAUSE_TIME = Integer.valueOf(RpcConfig.getProperty(RpcPropertyEnum.SERVER_MAX_PAUSE_TIME));
 
     private NettyServer() {
-        serviceRegistry = new ZkServiceRegistry();
+        serviceRegistry = ExtensionLoader.getExtensionLoader(ServiceRegistry.class).getExtension("Zookeeper");
         serviceProvider = new DefaultServiceProviderImpl();
-        KryoSerializer kryoSerializer = new KryoSerializer();
 
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         EventLoopGroup bossGroup = new NioEventLoopGroup();
@@ -56,8 +54,8 @@ public class NettyServer {
                     @Override
                     public void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline().addLast(new IdleStateHandler(MAX_PAUSE_TIME, 0, 0, TimeUnit.SECONDS));
-                        ch.pipeline().addLast(new RpcMsgDecoder());
-                        ch.pipeline().addLast(new RpcMsgEncoder());
+                        ch.pipeline().addLast(new NettyMsgDecoder());
+                        ch.pipeline().addLast(new NettyMsgEncoder());
                         ch.pipeline().addLast(new ServerHeartbeatHandler());
                         ch.pipeline().addLast(new NettyServerHandler());
                     }

@@ -1,9 +1,12 @@
 package github.tmx.rpc.core.serialize;
 
+import github.tmx.rpc.core.extension.SPI;
+
 /**
  * @author: TangMinXuan
  * @created: 2020/10/02 10:23
  */
+@SPI
 public interface Serializer {
 
     /**

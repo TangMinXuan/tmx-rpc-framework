@@ -11,6 +11,7 @@ import java.util.List;
  * @author: TangMinXuan
  * @created: 2020/10/02 16:06
  */
+@Deprecated
 public class NettyKryoDecoder extends ByteToMessageDecoder {
 
     private Serializer serializer;

@@ -1,11 +1,14 @@
 package github.tmx.rpc.core.registry;
 
+import github.tmx.rpc.core.extension.SPI;
+
 import java.net.InetSocketAddress;
 
 /**
  * @author: TangMinXuan
  * @created: 2020/10/22 18:38
  */
+@SPI
 public interface ServiceDiscovery {
 
     /**

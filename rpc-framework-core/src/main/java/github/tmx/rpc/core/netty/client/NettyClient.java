@@ -2,13 +2,13 @@ package github.tmx.rpc.core.netty.client;
 
 import github.tmx.rpc.core.common.DTO.RpcRequest;
 import github.tmx.rpc.core.common.DTO.RpcResponse;
-import github.tmx.rpc.core.common.config.RpcConfig;
 import github.tmx.rpc.core.common.enumeration.RpcPropertyEnum;
 import github.tmx.rpc.core.common.enumeration.RpcResponseEnum;
-import github.tmx.rpc.core.netty.coded.RpcMsgDecoder;
-import github.tmx.rpc.core.netty.coded.RpcMsgEncoder;
-import github.tmx.rpc.core.registry.zookeeper.ZkServiceDiscovery;
-import github.tmx.rpc.core.serialize.kryo.KryoSerializer;
+import github.tmx.rpc.core.config.RpcConfig;
+import github.tmx.rpc.core.extension.ExtensionLoader;
+import github.tmx.rpc.core.netty.coded.NettyMsgDecoder;
+import github.tmx.rpc.core.netty.coded.NettyMsgEncoder;
+import github.tmx.rpc.core.registry.ServiceDiscovery;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -37,7 +37,7 @@ public class NettyClient implements RpcClient {
     private volatile static NettyClient nettyClient = null;
 
     private final Map<InetSocketAddress, Channel> channelCacheMap;
-    private final ZkServiceDiscovery zkServiceDiscovery;
+    private final ServiceDiscovery serviceDiscovery;
 
     private final int RETRY_INTERVAL = Integer.valueOf(RpcConfig.getProperty(RpcPropertyEnum.CLIENT_RETRY_INTERVAL));
     private final int RETRY_COUNT = Integer.valueOf(RpcConfig.getProperty(RpcPropertyEnum.CLIENT_RETRY_COUNT));
@@ -48,9 +48,8 @@ public class NettyClient implements RpcClient {
 
     private NettyClient() {
         channelCacheMap = new ConcurrentHashMap<>();
-        zkServiceDiscovery = new ZkServiceDiscovery();
+        serviceDiscovery = ExtensionLoader.getExtensionLoader(ServiceDiscovery.class).getExtension("Zookeeper");
         EventLoopGroup eventLoopGroup = new NioEventLoopGroup();
-        KryoSerializer kryoSerializer = new KryoSerializer();
         bootstrap = new Bootstrap();
 
         bootstrap.group(eventLoopGroup)
@@ -65,8 +64,8 @@ public class NettyClient implements RpcClient {
                     @Override
                     protected void initChannel(SocketChannel ch) {
                         ch.pipeline().addLast(new IdleStateHandler(MAX_PAUSE_TIME, PING_INTERVAL, 0, TimeUnit.SECONDS));
-                        ch.pipeline().addLast(new RpcMsgDecoder());
-                        ch.pipeline().addLast(new RpcMsgEncoder());
+                        ch.pipeline().addLast(new NettyMsgDecoder());
+                        ch.pipeline().addLast(new NettyMsgEncoder());
                         ch.pipeline().addLast(new ClientHeartbeatHandler());
                         ch.pipeline().addLast(new NettyClientHandler());
                     }
@@ -101,7 +100,7 @@ public class NettyClient implements RpcClient {
         CompletableFuture<RpcResponse> resultFuture = new CompletableFuture<>();
 
         // 拿着接口名, 向 Zk 寻找 provider 地址
-        InetSocketAddress providerAddress = zkServiceDiscovery.lookupService(rpcRequest.getInterfaceName());
+        InetSocketAddress providerAddress = serviceDiscovery.lookupService(rpcRequest.getInterfaceName());
         if (providerAddress == null) {
             resultFuture.complete(RpcResponse.fail(rpcRequest.getRequestId(), RpcResponseEnum.NOT_FOUND_SERVER));
             return resultFuture;

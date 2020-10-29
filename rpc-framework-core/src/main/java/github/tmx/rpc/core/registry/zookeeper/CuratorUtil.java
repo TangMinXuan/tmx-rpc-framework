@@ -1,7 +1,7 @@
 package github.tmx.rpc.core.registry.zookeeper;
 
-import github.tmx.rpc.core.common.config.RpcConfig;
 import github.tmx.rpc.core.common.enumeration.RpcPropertyEnum;
+import github.tmx.rpc.core.config.RpcConfig;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;

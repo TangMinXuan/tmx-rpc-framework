@@ -9,6 +9,7 @@ import io.netty.handler.codec.MessageToByteEncoder;
  * @author: TangMinXuan
  * @created: 2020/10/02 15:53
  */
+@Deprecated
 public class NettyKryoEncoder extends MessageToByteEncoder {
 
     private Serializer serializer;

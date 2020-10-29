@@ -2,9 +2,9 @@ package github.tmx.rpc.core.netty.client;
 
 import github.tmx.rpc.core.common.DTO.RpcRequest;
 import github.tmx.rpc.core.common.DTO.RpcResponse;
-import github.tmx.rpc.core.common.config.RpcConfig;
 import github.tmx.rpc.core.common.enumeration.RpcMessageTypeEnum;
 import github.tmx.rpc.core.common.enumeration.RpcPropertyEnum;
+import github.tmx.rpc.core.config.RpcConfig;
 import io.netty.channel.*;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;

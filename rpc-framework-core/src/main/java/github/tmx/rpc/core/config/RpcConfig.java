@@ -1,4 +1,4 @@
-package github.tmx.rpc.core.common.config;
+package github.tmx.rpc.core.config;
 
 import github.tmx.rpc.core.common.enumeration.RpcPropertyEnum;
 import org.slf4j.Logger;
