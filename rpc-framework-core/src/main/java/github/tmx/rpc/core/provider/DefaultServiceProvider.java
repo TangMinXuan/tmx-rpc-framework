@@ -1,16 +1,14 @@
-package github.tmx.rpc.core.netty.server.provider;
+package github.tmx.rpc.core.provider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class DefaultServiceProviderImpl implements ServiceProvider {
+public class DefaultServiceProvider implements ServiceProvider {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultServiceProviderImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultServiceProvider.class);
 
     // key-value: interfaceName-interfaceImplObject
     private static final Map<String, Object> providerMap = new HashMap<>();
@@ -36,14 +34,5 @@ public class DefaultServiceProviderImpl implements ServiceProvider {
             logger.error("找不到服务: {}", serviceName);
         }
         return service;
-    }
-
-    @Override
-    public List<String> getAllService() {
-        List<String> keysList = new ArrayList<>();
-        for (String interfaceName : providerMap.keySet()) {
-            keysList.add(interfaceName);
-        }
-        return keysList;
     }
 }

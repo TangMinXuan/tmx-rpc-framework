@@ -1,4 +1,4 @@
-package github.tmx.rpc.core.spring.processor;
+package github.tmx.rpc.core.spring.component;
 
 import github.tmx.rpc.core.netty.client.NettyRpcClientProxy;
 import github.tmx.rpc.core.spring.annotion.RpcReference;

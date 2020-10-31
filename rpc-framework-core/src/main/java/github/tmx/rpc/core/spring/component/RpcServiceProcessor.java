@@ -1,4 +1,4 @@
-package github.tmx.rpc.core.spring.processor;
+package github.tmx.rpc.core.spring.component;
 
 import github.tmx.rpc.core.netty.server.NettyServer;
 import github.tmx.rpc.core.spring.annotion.RpcService;
@@ -18,16 +18,11 @@ public class RpcServiceProcessor implements BeanPostProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(RpcServiceProcessor.class);
 
-    private NettyServer nettyServer = null;
-
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         if (bean.getClass().isAnnotationPresent(RpcService.class)) {
-            logger.info("[{}] 被标记为  [{}]", bean.getClass().getName(), RpcService.class.getCanonicalName());
-            if (nettyServer == null) {
-                nettyServer = NettyServer.getInstance();
-            }
-            nettyServer.publishService(bean);
+            logger.info("[{}] 被标记为 @RpcService", bean.getClass().getName());
+            NettyServer.getInstance().publishService(bean);
         }
         return bean;
     }

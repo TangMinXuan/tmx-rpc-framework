@@ -21,7 +21,7 @@ public class RpcBeanRegistrar implements ImportBeanDefinitionRegistrar, Resource
 
     private static final Logger logger = LoggerFactory.getLogger(RpcBeanRegistrar.class);
 
-    private static final String SPRING_PROCESSOR_BASE_PACKAGE = "github.tmx.rpc.core.spring.processor";
+    private static final String SPRING_PROCESSOR_BASE_PACKAGE = "github.tmx.rpc.core.spring.component";
     private static final String BASE_PACKAGE_ATTRIBUTE_NAME = "basePackage";
     private ResourceLoader resourceLoader;
 
@@ -53,8 +53,8 @@ public class RpcBeanRegistrar implements ImportBeanDefinitionRegistrar, Resource
             springBeanScanner.setResourceLoader(resourceLoader);
         }
         int processorAmount = springBeanScanner.scan(SPRING_PROCESSOR_BASE_PACKAGE);
-        logger.info("processor扫描的数量 [{}]", processorAmount);
+        logger.info("component 扫描的数量 [{}]", processorAmount);
         int rpcServiceAmount = rpcServiceScanner.scan(basePackages);
-        logger.info("rpcService扫描的数量 [{}]", rpcServiceAmount);
+        logger.info("rpcService 扫描的数量 [{}]", rpcServiceAmount);
     }
 }

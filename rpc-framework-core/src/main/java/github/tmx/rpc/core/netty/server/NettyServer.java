@@ -5,8 +5,7 @@ import github.tmx.rpc.core.config.RpcConfig;
 import github.tmx.rpc.core.extension.ExtensionLoader;
 import github.tmx.rpc.core.netty.coded.NettyMsgDecoder;
 import github.tmx.rpc.core.netty.coded.NettyMsgEncoder;
-import github.tmx.rpc.core.netty.server.provider.DefaultServiceProviderImpl;
-import github.tmx.rpc.core.netty.server.provider.ServiceProvider;
+import github.tmx.rpc.core.provider.ServiceProvider;
 import github.tmx.rpc.core.registry.ServiceRegistry;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -38,8 +37,10 @@ public class NettyServer {
     private final int MAX_PAUSE_TIME = Integer.valueOf(RpcConfig.getProperty(RpcPropertyEnum.SERVER_MAX_PAUSE_TIME));
 
     private NettyServer() {
+        // 注册中心
         serviceRegistry = ExtensionLoader.getExtensionLoader(ServiceRegistry.class).getExtension("Zookeeper");
-        serviceProvider = new DefaultServiceProviderImpl();
+        // 容器
+        serviceProvider = ExtensionLoader.getExtensionLoader(ServiceProvider.class).getExtension("Spring");
 
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         EventLoopGroup bossGroup = new NioEventLoopGroup();
@@ -97,5 +98,13 @@ public class NettyServer {
             serviceProvider.addProvider(i.getCanonicalName(), service);
             serviceRegistry.registerService(i.getCanonicalName());
         }
+    }
+
+    public ServiceRegistry getServiceRegistry() {
+        return serviceRegistry;
+    }
+
+    public ServiceProvider getServiceProvider() {
+        return serviceProvider;
     }
 }
