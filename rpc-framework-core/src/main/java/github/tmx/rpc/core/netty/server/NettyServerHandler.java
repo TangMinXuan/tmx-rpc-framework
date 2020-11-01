@@ -36,8 +36,10 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
             logger.info("服务器收到请求: {}", rpcRequest);
 
             // 执行具体的接口逻辑
-            String requestInterfaceName = rpcRequest.getInterfaceName();
-            Object serviceImpl = serviceProvider.getProvider(requestInterfaceName);
+            String interfaceName = rpcRequest.getInterfaceName();
+            String group = rpcRequest.getGroup();
+            String version = rpcRequest.getVersion();
+            Object serviceImpl = serviceProvider.getProvider(interfaceName, group, version);
             Object result = reflectInvoke.invokeTargetMethod(rpcRequest, serviceImpl);
             logger.info("服务器执行结果: {}", result.toString());
 

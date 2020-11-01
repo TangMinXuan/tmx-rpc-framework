@@ -9,6 +9,7 @@ import github.tmx.rpc.core.extension.ExtensionLoader;
 import github.tmx.rpc.core.netty.coded.NettyMsgDecoder;
 import github.tmx.rpc.core.netty.coded.NettyMsgEncoder;
 import github.tmx.rpc.core.registry.ServiceDiscovery;
+import github.tmx.rpc.core.spring.BeanNameUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -99,8 +100,10 @@ public class NettyClient implements RpcClient {
     public CompletableFuture<RpcResponse> sendRpcRequest(RpcRequest rpcRequest) {
         CompletableFuture<RpcResponse> resultFuture = new CompletableFuture<>();
 
-        // 拿着接口名, 向 Zk 寻找 provider 地址
-        InetSocketAddress providerAddress = serviceDiscovery.lookupService(rpcRequest.getInterfaceName());
+        // 向 Zk 寻找 provider 地址
+        String serviceName = BeanNameUtil.getBeanName(rpcRequest.getInterfaceName(), rpcRequest.getGroup(), rpcRequest.getVersion());
+        System.out.println("serviceName = " + serviceName);
+        InetSocketAddress providerAddress = serviceDiscovery.lookupService(serviceName);
         if (providerAddress == null) {
             resultFuture.complete(RpcResponse.fail(rpcRequest.getRequestId(), RpcResponseEnum.NOT_FOUND_SERVER));
             return resultFuture;

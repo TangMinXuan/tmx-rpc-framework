@@ -26,10 +26,9 @@ public class RpcReferenceProcessor implements BeanPostProcessor {
         Field[] declaredFields = targetClass.getDeclaredFields();
         for (Field declaredField : declaredFields) {
             RpcReference rpcReference = declaredField.getAnnotation(RpcReference.class);
-
             // 只有存在 @RpcReference 注解, 才去启动 NettyClient
             if (rpcReference != null) {
-                NettyRpcClientProxy nettyRpcClientProxy = new NettyRpcClientProxy();
+                NettyRpcClientProxy nettyRpcClientProxy = new NettyRpcClientProxy(rpcReference.group(), rpcReference.version());
                 Object proxyObject = nettyRpcClientProxy.getProxyInstance(declaredField.getType());
                 declaredField.setAccessible(true);
                 try {

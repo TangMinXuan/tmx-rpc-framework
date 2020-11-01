@@ -26,8 +26,8 @@ public class ZkServiceDiscovery implements ServiceDiscovery {
     }
 
     @Override
-    public InetSocketAddress lookupService(String interfaceName) {
-        List<String> providerList = CuratorUtil.getChildrenNodes(zkClient, interfaceName);
+    public InetSocketAddress lookupService(String serviceName) {
+        List<String> providerList = CuratorUtil.getChildrenNodes(zkClient, serviceName);
         if (providerList.size() <= 0) {
             logger.info("找不到服务提供者地址");
             return null;

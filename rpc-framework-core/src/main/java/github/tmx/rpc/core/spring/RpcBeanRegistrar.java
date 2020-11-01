@@ -2,6 +2,7 @@ package github.tmx.rpc.core.spring;
 
 import github.tmx.rpc.core.spring.annotion.EnableRPC;
 import github.tmx.rpc.core.spring.annotion.RpcService;
+import github.tmx.rpc.core.spring.component.ServiceNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -46,6 +47,7 @@ public class RpcBeanRegistrar implements ImportBeanDefinitionRegistrar, Resource
         }
         // 扫描 @RpcService
         RpcBeanScanner rpcServiceScanner = new RpcBeanScanner(beanDefinitionRegistry, RpcService.class);
+        rpcServiceScanner.setBeanNameGenerator(new ServiceNameGenerator());
         // 扫描 core 模块中的 2 个 processor
         RpcBeanScanner springBeanScanner = new RpcBeanScanner(beanDefinitionRegistry, Component.class);
         if (resourceLoader != null) {

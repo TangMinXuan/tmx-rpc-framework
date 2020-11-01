@@ -90,14 +90,15 @@ public class NettyServer {
      * @param service 服务接口实现类
      */
     public void publishService(Object service) {
-        Class[] interfaces = service.getClass().getInterfaces();
-        if (interfaces.length == 0) {
-            logger.error("服务没有实现任何接口");
-        }
-        for (Class i : interfaces) {
-            serviceProvider.addProvider(i.getCanonicalName(), service);
-            serviceRegistry.registerService(i.getCanonicalName());
-        }
+        serviceProvider.addProvider(service);
+    }
+
+    /**
+     * 注册服务, 适用于 Spring 作为容器的情况, 因为 Spring 在扫描 RpcService 时会将他自动添加进容器
+     * @param serviceName
+     */
+    public void registerService(String serviceName) {
+        serviceRegistry.registerService(serviceName);
     }
 
     public ServiceRegistry getServiceRegistry() {

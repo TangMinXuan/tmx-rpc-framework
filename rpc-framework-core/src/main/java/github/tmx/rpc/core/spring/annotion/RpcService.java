@@ -11,4 +11,8 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE})
 @Inherited
 public @interface RpcService {
+
+    String group() default "test";
+
+    String version() default "v1.0.0";
 }

@@ -14,4 +14,8 @@ import java.lang.annotation.*;
 @Inherited
 @Component
 public @interface RpcReference {
+
+    String group() default "test";
+
+    String version() default "v1.0.0";
 }

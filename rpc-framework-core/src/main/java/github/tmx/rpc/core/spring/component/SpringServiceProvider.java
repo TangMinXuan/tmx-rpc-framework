@@ -1,6 +1,7 @@
 package github.tmx.rpc.core.spring.component;
 
 import github.tmx.rpc.core.provider.ServiceProvider;
+import github.tmx.rpc.core.spring.BeanNameUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -25,29 +26,19 @@ public class SpringServiceProvider implements ServiceProvider, ApplicationContex
     private static BeanDefinitionRegistry registry;
 
     @Override
-    public void addProvider(String serviceName, Object service) {
-        if (getProvider(serviceName) != null) {
+    public void addProvider(Object service) {
+        String beanName = BeanNameUtil.getBeanName(service);
+        if (applicationContext.containsBean(beanName)) {
             return ;
         }
         RootBeanDefinition rootBeanDefinition = new RootBeanDefinition(service.getClass());
-        registry.registerBeanDefinition(service.getClass().getCanonicalName(), rootBeanDefinition);
+        registry.registerBeanDefinition(beanName, rootBeanDefinition);
     }
 
     @Override
-    public Object getProvider(String serviceName) {
-        Class<?> clazz = null;
-        try {
-            clazz = Class.forName(serviceName);
-        } catch (ClassNotFoundException e) {
-            logger.error("由接口名反射接口Class对象时, 无法找到接口类: {}", e);
-        }
-        String[] serviceImplNameArray = applicationContext.getBeanNamesForType(clazz);
-        for (String serviceImplName : serviceImplNameArray) {
-            if (applicationContext.containsBean(serviceImplName)) {
-                return applicationContext.getBean(serviceImplName);
-            }
-        }
-        return null;
+    public Object getProvider(String serviceName, String group, String version) {
+        String beanName = BeanNameUtil.getBeanName(serviceName, group, version);
+        return applicationContext.getBean(beanName);
     }
 
     @Override

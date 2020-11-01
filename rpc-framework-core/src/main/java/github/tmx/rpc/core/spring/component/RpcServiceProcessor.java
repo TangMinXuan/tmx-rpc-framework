@@ -22,7 +22,8 @@ public class RpcServiceProcessor implements BeanPostProcessor {
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         if (bean.getClass().isAnnotationPresent(RpcService.class)) {
             logger.info("[{}] 被标记为 @RpcService", bean.getClass().getName());
-            NettyServer.getInstance().publishService(bean);
+            System.out.println("beanName = " + beanName);
+            NettyServer.getInstance().registerService(beanName);
         }
         return bean;
     }

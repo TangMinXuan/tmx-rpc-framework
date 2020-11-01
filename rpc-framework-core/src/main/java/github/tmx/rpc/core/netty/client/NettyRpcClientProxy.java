@@ -25,10 +25,14 @@ public class NettyRpcClientProxy implements InvocationHandler {
 
     private static final Integer INVOKE_TIME = 30000;
     private final RpcClient rpcClient;
+    private final String group;
+    private final String version;
 
-    public NettyRpcClientProxy() {
-        // 多个 nettyRpcClientProxy 公用一个 nettyClient 对象
+    public NettyRpcClientProxy(String group, String version) {
+        // 多个 nettyRpcClientProxy 共用一个 nettyClient 对象
         rpcClient = NettyClient.getInstance();
+        this.group = group;
+        this.version = version;
     }
 
     public <T> T getProxyInstance(Class<T> clazz) {
@@ -45,6 +49,8 @@ public class NettyRpcClientProxy implements InvocationHandler {
                 .paramTypes(method.getParameterTypes())
                 .requestId(UUID.randomUUID().toString())
                 .messageTypeEnum(RpcMessageTypeEnum.RPC_REQUEST)
+                .group(group)
+                .version(version)
                 .build();
         CompletableFuture<RpcResponse> resultFuture = rpcClient.sendRpcRequest(rpcRequest);
         // 阻塞获取 rpcResponse

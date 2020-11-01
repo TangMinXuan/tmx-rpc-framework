@@ -8,7 +8,7 @@ import github.tmx.rpc.core.extension.SPI;
 @SPI
 public interface ServiceProvider {
 
-    void addProvider(String serviceName, Object service);
+    void addProvider(Object service);
 
-    Object getProvider(String serviceName);
+    Object getProvider(String serviceName, String group, String version);
 }

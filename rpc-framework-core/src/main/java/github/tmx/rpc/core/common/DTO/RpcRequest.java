@@ -7,7 +7,6 @@ import java.io.Serializable;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
 @Data
 @Builder
 @ToString
@@ -22,5 +21,9 @@ public class RpcRequest implements Serializable {
     private RpcMessageTypeEnum messageTypeEnum;
     private String version;
     private String group;
+
+    public String getServiceName() {
+        return interfaceName + "[" + group + "]" + "[" + version + "]";
+    }
 
 }

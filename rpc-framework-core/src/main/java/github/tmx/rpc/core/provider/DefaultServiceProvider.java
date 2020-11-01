@@ -13,12 +13,9 @@ public class DefaultServiceProvider implements ServiceProvider {
     // key-value: interfaceName-interfaceImplObject
     private static final Map<String, Object> providerMap = new HashMap<>();
 
-    /**
-     * 添加服务
-     * @param serviceName
-     */
     @Override
-    public void addProvider(String serviceName, Object service) {
+    public void addProvider(Object service) {
+        String serviceName = null;
         if (providerMap.containsKey(serviceName)) {
             logger.info("接口: {} 已经添加过了, 不允许重复添加", serviceName);
             return ;
@@ -28,7 +25,7 @@ public class DefaultServiceProvider implements ServiceProvider {
     }
 
     @Override
-    public Object getProvider(String serviceName) {
+    public Object getProvider(String serviceName, String group, String version) {
         Object service = providerMap.get(serviceName);
         if (null == service) {
             logger.error("找不到服务: {}", serviceName);
