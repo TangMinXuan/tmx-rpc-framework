@@ -1,6 +1,5 @@
 package github.tmx.rpc.core.config;
 
-import github.tmx.rpc.core.common.enumeration.RpcPropertyEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,7 +1,7 @@
 package github.tmx.rpc.core.registry.zookeeper;
 
-import github.tmx.rpc.core.common.enumeration.RpcPropertyEnum;
 import github.tmx.rpc.core.config.RpcConfig;
+import github.tmx.rpc.core.config.RpcPropertyEnum;
 import github.tmx.rpc.core.registry.ServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

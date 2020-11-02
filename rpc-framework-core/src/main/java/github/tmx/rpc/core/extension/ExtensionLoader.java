@@ -67,6 +67,7 @@ public final class ExtensionLoader<T> {
             throw new IllegalArgumentException("扩展接口类应该是一个接口.");
         }
         if (type.getAnnotation(SPI.class) == null) {
+            logger.error("扩展接口类: {} 应该被 @SPI 标注", type);
             throw new IllegalArgumentException("扩展接口类应该被 @SPI 标注");
         }
 

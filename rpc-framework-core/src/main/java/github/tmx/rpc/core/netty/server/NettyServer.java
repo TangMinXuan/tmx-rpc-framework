@@ -1,7 +1,7 @@
 package github.tmx.rpc.core.netty.server;
 
-import github.tmx.rpc.core.common.enumeration.RpcPropertyEnum;
 import github.tmx.rpc.core.config.RpcConfig;
+import github.tmx.rpc.core.config.RpcPropertyEnum;
 import github.tmx.rpc.core.extension.ExtensionLoader;
 import github.tmx.rpc.core.netty.coded.NettyMsgDecoder;
 import github.tmx.rpc.core.netty.coded.NettyMsgEncoder;

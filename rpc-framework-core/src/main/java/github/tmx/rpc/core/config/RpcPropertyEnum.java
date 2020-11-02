@@ -1,4 +1,4 @@
-package github.tmx.rpc.core.common.enumeration;
+package github.tmx.rpc.core.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,7 +34,9 @@ public enum RpcPropertyEnum {
     // 客户端连接服务器重试间隔 (单位: 秒)
     CLIENT_RETRY_INTERVAL("rpc.client.retryInterval", "3"),
     // 客户端连接服务器重试次数
-    CLIENT_RETRY_COUNT("rpc.client.retryCount", "3");
+    CLIENT_RETRY_COUNT("rpc.client.retryCount", "3"),
+    // 客户端负载均衡策略
+    CLIENT_LOAD_BALANCE("rpc.client.loadBalance", "Random");
 
     private String name;
     private String defaultValue;

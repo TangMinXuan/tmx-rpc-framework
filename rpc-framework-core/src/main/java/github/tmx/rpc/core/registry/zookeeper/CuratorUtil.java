@@ -1,7 +1,7 @@
 package github.tmx.rpc.core.registry.zookeeper;
 
-import github.tmx.rpc.core.common.enumeration.RpcPropertyEnum;
 import github.tmx.rpc.core.config.RpcConfig;
+import github.tmx.rpc.core.config.RpcPropertyEnum;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -26,6 +26,8 @@ public final class CuratorUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(CuratorUtil.class);
 
+    // key: serviceName
+    // value: providerList
     private static final Map<String, List<String>> serviceAddressCacheMap = new ConcurrentHashMap<>();
 
     private static CuratorFramework zkClient = null;

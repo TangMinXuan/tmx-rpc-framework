@@ -68,10 +68,8 @@ public class NettyMsgDecoder extends ByteToMessageDecoder {
         byteBuf.readBytes(body);
         Object obj = null;
         if (type == 0) {
-            logger.info("反序列化-->RpcRequest");
             obj = serializer.deserialize(body, RpcRequest.class);
         } else if (type == 1) {
-            logger.info("反序列化-->RpcResponse");
             obj = serializer.deserialize(body, RpcResponse.class);
         } else {
             logger.info("未知消息类型");

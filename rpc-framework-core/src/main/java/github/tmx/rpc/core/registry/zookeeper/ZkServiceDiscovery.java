@@ -1,5 +1,9 @@
 package github.tmx.rpc.core.registry.zookeeper;
 
+import github.tmx.rpc.core.config.RpcConfig;
+import github.tmx.rpc.core.config.RpcPropertyEnum;
+import github.tmx.rpc.core.extension.ExtensionLoader;
+import github.tmx.rpc.core.loadbalance.LoadBalance;
 import github.tmx.rpc.core.registry.ServiceDiscovery;
 import org.apache.curator.framework.CuratorFramework;
 import org.slf4j.Logger;
@@ -17,12 +21,13 @@ public class ZkServiceDiscovery implements ServiceDiscovery {
     private static final Logger logger = LoggerFactory.getLogger(ZkServiceDiscovery.class);
 
     private CuratorFramework zkClient = null;
+    private LoadBalance loadBalance = null;
 
-    /**
-     * 实例化时就连接 Zookeeper 注册中心, 防止调用过程需要等待连接 Zk
-     */
     public ZkServiceDiscovery() {
+        // 实例化时就连接 Zookeeper 注册中心, 防止调用过程需要等待连接 Zk
         zkClient = CuratorUtil.getZkClient();
+        String loadBalanceStrategy = RpcConfig.getProperty(RpcPropertyEnum.CLIENT_LOAD_BALANCE);
+        loadBalance = ExtensionLoader.getExtensionLoader(LoadBalance.class).getExtension(loadBalanceStrategy);
     }
 
     @Override
@@ -32,7 +37,7 @@ public class ZkServiceDiscovery implements ServiceDiscovery {
             logger.info("找不到服务提供者地址");
             return null;
         }
-        String serviceAddress = providerList.get(0);
+        String serviceAddress = loadBalance.selectServiceAddress(providerList);
         logger.info("成功找到服务地址:{}", serviceAddress);
 
         //按照 ip:port 的格式切分 serviceAddress

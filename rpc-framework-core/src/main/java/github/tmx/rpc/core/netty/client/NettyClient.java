@@ -2,9 +2,9 @@ package github.tmx.rpc.core.netty.client;
 
 import github.tmx.rpc.core.common.DTO.RpcRequest;
 import github.tmx.rpc.core.common.DTO.RpcResponse;
-import github.tmx.rpc.core.common.enumeration.RpcPropertyEnum;
 import github.tmx.rpc.core.common.enumeration.RpcResponseEnum;
 import github.tmx.rpc.core.config.RpcConfig;
+import github.tmx.rpc.core.config.RpcPropertyEnum;
 import github.tmx.rpc.core.extension.ExtensionLoader;
 import github.tmx.rpc.core.netty.coded.NettyMsgDecoder;
 import github.tmx.rpc.core.netty.coded.NettyMsgEncoder;
