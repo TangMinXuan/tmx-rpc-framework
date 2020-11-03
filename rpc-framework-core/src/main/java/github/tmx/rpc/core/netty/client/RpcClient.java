@@ -11,5 +11,10 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface RpcClient {
 
+    /**
+     * 发送 Rpc 请求
+     * @param rpcRequest
+     * @return
+     */
     CompletableFuture<RpcResponse> sendRpcRequest(RpcRequest rpcRequest);
 }

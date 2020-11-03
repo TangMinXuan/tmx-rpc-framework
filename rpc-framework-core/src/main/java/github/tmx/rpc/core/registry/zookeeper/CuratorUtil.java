@@ -26,13 +26,17 @@ public final class CuratorUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(CuratorUtil.class);
 
-    // key: serviceName
-    // value: providerList
-    private static final Map<String, List<String>> serviceAddressCacheMap = new ConcurrentHashMap<>();
+    /**
+     * key: serviceName
+     * value: providerList
+     */
+    private static Map<String, List<String>> serviceAddressCacheMap = new ConcurrentHashMap<>();
 
     private static CuratorFramework zkClient = null;
 
-    // 连接参数
+    /**
+     * 连接参数
+     */
     private static int CONNECTION_TIMEOUT_MS = 10 * 1000;
     private static int SESSION_TIMEOUT_MS = 30 * 1000;
     public static String ROOT_PATH = RpcConfig.getProperty(RpcPropertyEnum.ZK_ROOT_PATH);
@@ -54,6 +58,7 @@ public final class CuratorUtil {
                 //会话超时时间，30秒
                 .sessionTimeoutMs(SESSION_TIMEOUT_MS)
                 .build();
+        logger.info("连接 Zookeeper[{}] 注册中心 ...", ZK_ADDRESS);
         zkClient.start();
         return zkClient;
     }
@@ -65,7 +70,7 @@ public final class CuratorUtil {
     public static void createEphemeralNode(CuratorFramework zkClient, String path) {
         try {
             if (zkClient.checkExists().forPath(path) != null) {
-                logger.info("节点已经存在, 即将删除");
+                logger.debug("节点已经存在, 即将删除");
                 zkClient.delete().forPath(path);
             }
             zkClient.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path);
@@ -102,7 +107,7 @@ public final class CuratorUtil {
     public static void deleteEphemeralNode(CuratorFramework zkClient, String path) {
         try {
             if (zkClient.checkExists().forPath(path) == null) {
-                logger.info("节点不存在, 直接返回");
+                logger.debug("节点不存在, 直接返回");
                 return ;
             }
             zkClient.delete().forPath(path);
@@ -123,8 +128,8 @@ public final class CuratorUtil {
         // 添加并启动监听器, 当有事件发生时, 将会触发下面的回调函数
         PathChildrenCacheListener pathChildrenCacheListener = (curatorFramework, pathChildrenCacheEvent) -> {
             List<String> serviceAddresses = curatorFramework.getChildren().forPath(servicePath);
-            logger.info("监听到 Zookeeper 节点发生变化, 即将更新 providerList 缓存");
-            logger.info("新的 providerList 是: {}", serviceAddresses);
+            logger.debug("监听到 Zookeeper 节点发生变化, 即将更新 providerList 缓存");
+            logger.debug("新的 providerList 是: {}", serviceAddresses);
             serviceAddressCacheMap.put(serviceName, serviceAddresses);
         };
         pathChildrenCache.getListenable().addListener(pathChildrenCacheListener);

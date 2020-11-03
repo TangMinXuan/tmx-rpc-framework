@@ -6,8 +6,8 @@ import github.tmx.rpc.core.common.enumeration.RpcResponseEnum;
 import github.tmx.rpc.core.config.RpcConfig;
 import github.tmx.rpc.core.config.RpcPropertyEnum;
 import github.tmx.rpc.core.extension.ExtensionLoader;
-import github.tmx.rpc.core.netty.coded.NettyMsgDecoder;
-import github.tmx.rpc.core.netty.coded.NettyMsgEncoder;
+import github.tmx.rpc.core.netty.codec.NettyMsgDecoder;
+import github.tmx.rpc.core.netty.codec.NettyMsgEncoder;
 import github.tmx.rpc.core.registry.ServiceDiscovery;
 import github.tmx.rpc.core.spring.BeanNameUtil;
 import io.netty.bootstrap.Bootstrap;
@@ -102,7 +102,6 @@ public class NettyClient implements RpcClient {
 
         // 向 Zk 寻找 provider 地址
         String serviceName = BeanNameUtil.getBeanName(rpcRequest.getInterfaceName(), rpcRequest.getGroup(), rpcRequest.getVersion());
-        System.out.println("serviceName = " + serviceName);
         InetSocketAddress providerAddress = serviceDiscovery.lookupService(serviceName);
         if (providerAddress == null) {
             resultFuture.complete(RpcResponse.fail(rpcRequest.getRequestId(), RpcResponseEnum.NOT_FOUND_SERVER));
@@ -116,7 +115,7 @@ public class NettyClient implements RpcClient {
         if (channel != null && channel.isActive()) {
             channel.writeAndFlush(rpcRequest).addListener((ChannelFutureListener) future -> {
                 if (future.isSuccess()) {
-                    logger.info("发送请求成功: {}", rpcRequest);
+                    logger.debug("发送请求成功: {}", rpcRequest);
                 } else {
                     logger.error("发送请求失败: {}, 失败原因: {}", rpcRequest, future.cause());
                 }

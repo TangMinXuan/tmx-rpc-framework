@@ -33,7 +33,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         try {
             // 这里的 msg 已经被前面的 kryoSerializer 反序列化过了，可以直接转为 RpcRequest
             RpcRequest rpcRequest = (RpcRequest) msg;
-            logger.info("服务器收到请求: {}", rpcRequest);
+            logger.debug("服务器收到请求: {}", rpcRequest);
 
             // 执行具体的接口逻辑
             String interfaceName = rpcRequest.getInterfaceName();
@@ -41,12 +41,13 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
             String version = rpcRequest.getVersion();
             Object serviceImpl = serviceProvider.getProvider(interfaceName, group, version);
             Object result = reflectInvoke.invokeTargetMethod(rpcRequest, serviceImpl);
-            logger.info("服务器执行结果: {}", result.toString());
+            logger.debug("服务器执行结果: {}", result.toString());
 
             ChannelFuture channelFuture = ctx.writeAndFlush(RpcResponse.success(result, rpcRequest.getRequestId(), false));
             channelFuture.addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
         } finally {
-            ReferenceCountUtil.release(msg);       // 这里是为了避免内存泄漏
+            // 避免内存泄漏
+            ReferenceCountUtil.release(msg);
         }
     }
 

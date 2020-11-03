@@ -41,7 +41,7 @@ public class NettyRpcClientProxy implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        logger.info("调用代理对象方法: {}", method.getName());
+        logger.debug("调用代理对象方法: {}", method.getName());
         RpcRequest rpcRequest = RpcRequest.builder()
                 .interfaceName(method.getDeclaringClass().getName())
                 .methodName(method.getName())
@@ -58,7 +58,7 @@ public class NettyRpcClientProxy implements InvocationHandler {
         try {
             rpcResponse = resultFuture.get(INVOKE_TIME, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
-            logger.info("调用时间超时");
+            logger.warn("调用时间超时");
             // 超时的情况下, 必须手动 remove 掉 key, 否则会造成泄漏
             RpcResultFuture.remove(rpcRequest);
         }

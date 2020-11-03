@@ -3,8 +3,8 @@ package github.tmx.rpc.core.netty.server;
 import github.tmx.rpc.core.config.RpcConfig;
 import github.tmx.rpc.core.config.RpcPropertyEnum;
 import github.tmx.rpc.core.extension.ExtensionLoader;
-import github.tmx.rpc.core.netty.coded.NettyMsgDecoder;
-import github.tmx.rpc.core.netty.coded.NettyMsgEncoder;
+import github.tmx.rpc.core.netty.codec.NettyMsgDecoder;
+import github.tmx.rpc.core.netty.codec.NettyMsgEncoder;
 import github.tmx.rpc.core.provider.ServiceProvider;
 import github.tmx.rpc.core.registry.ServiceRegistry;
 import io.netty.bootstrap.ServerBootstrap;
@@ -69,9 +69,6 @@ public class NettyServer {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }));
-
-        // 实例化时绑定端口, 绑定后不再阻塞等待, 阻塞等待交由 Spring Boot 控制
-        bootstrap.bind(PORT);
     }
 
     public static NettyServer getInstance() {
@@ -83,6 +80,14 @@ public class NettyServer {
             }
         }
         return nettyServer;
+    }
+
+    public static void tryToStartWork() {
+        if (nettyServer != null && nettyServer.bootstrap != null) {
+            // 实例化时绑定端口, 绑定后不再阻塞等待, 阻塞等待交由 Spring Boot 控制
+            nettyServer.bootstrap.bind(nettyServer.PORT);
+            logger.info("服务器开始提供服务");
+        }
     }
 
     /**
@@ -99,6 +104,7 @@ public class NettyServer {
      */
     public void registerService(String serviceName) {
         serviceRegistry.registerService(serviceName);
+        logger.info("服务: {} 成功注册", serviceName);
     }
 
     public ServiceRegistry getServiceRegistry() {

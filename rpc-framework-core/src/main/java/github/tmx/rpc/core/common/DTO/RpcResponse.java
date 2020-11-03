@@ -6,6 +6,9 @@ import lombok.Data;
 
 import java.io.Serializable;
 
+/**
+ * @author: TangMinXuan
+ */
 @Data
 public class RpcResponse<T> implements Serializable {
 
@@ -35,11 +38,11 @@ public class RpcResponse<T> implements Serializable {
         return response;
     }
 
-    public static <T> RpcResponse<T> fail(String requestId, RpcResponseEnum RpcConstant) {
+    public static <T> RpcResponse<T> fail(String requestId, RpcResponseEnum rpcConstant) {
         RpcResponse<T> response = new RpcResponse<>();
         response.setRequestId(requestId);
-        response.setCode(RpcConstant.getCode());
-        response.setMessage(RpcConstant.getMessage());
+        response.setCode(rpcConstant.getCode());
+        response.setMessage(rpcConstant.getMessage());
         response.setData(null);
         response.setMessageTypeEnum(RpcMessageTypeEnum.RPC_REQUEST);
         return response;

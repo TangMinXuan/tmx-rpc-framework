@@ -30,23 +30,33 @@ public final class ExtensionLoader<T> {
 
     private static final String SERVICE_DIRECTORY = "META-INF/extensions/";
 
-    // key: @SPI接口的 class 对象
-    // value: ExtensionLoader对象
+    /**
+     * key: @SPI接口的 class 对象
+     * value: ExtensionLoader对象
+     */
     private static final Map<Class<?>, ExtensionLoader<?>> EXTENSION_LOADERS = new ConcurrentHashMap<>();
 
-    // key: 实现类的 class 对象
-    // value: 实现类实例对象
+    /**
+     * key: 实现类的 class 对象
+     * value: 实现类实例对象
+     */
     private static final Map<Class<?>, Object> EXTENSION_INSTANCES = new ConcurrentHashMap<>();
 
-    // 接口类 class 对象
+    /**
+     * 接口类 class 对象
+     */
     private final Class<?> type;
 
-    // key: 实现类简称
-    // value: 实现类实例对象
+    /**
+     * key: 实现类简称
+     * value: 实现类实例对象
+     */
     private final Map<String, Holder<Object>> cachedInstances = new ConcurrentHashMap<>();
 
-    // key: 实现类简称(字符串)
-    // value: 实现类的 class 对象
+    /**
+     * key: 实现类简称(字符串)
+     * value: 实现类的 class 对象
+     */
     private final Holder<Map<String, Class<?>>> cachedClasses = new Holder<>();
 
     private ExtensionLoader(Class<?> type) {
@@ -138,7 +148,7 @@ public final class ExtensionLoader<T> {
             synchronized (cachedClasses) {
                 classesMap = cachedClasses.get();
                 if (classesMap == null) {
-                    classesMap = new HashMap<>();
+                    classesMap = new HashMap<>(16);
                     // load all extensions from our extensions directory
                     loadDirectory(classesMap);
                     cachedClasses.set(classesMap);

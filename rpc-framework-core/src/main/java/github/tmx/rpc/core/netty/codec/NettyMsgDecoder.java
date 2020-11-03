@@ -1,4 +1,4 @@
-package github.tmx.rpc.core.netty.coded;
+package github.tmx.rpc.core.netty.codec;
 
 import github.tmx.rpc.core.common.DTO.RpcProtocol;
 import github.tmx.rpc.core.common.DTO.RpcRequest;
@@ -21,14 +21,16 @@ public class NettyMsgDecoder extends ByteToMessageDecoder {
 
     private static final Logger logger = LoggerFactory.getLogger(NettyMsgDecoder.class);
 
-    // 最短有效长度
+    /**
+     * 最短有效长度
+     */
     private static final int MINIMUM_EFFECTIVE_LENGTH = 14;
     private Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension("Kryo");
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {
         if (byteBuf.readableBytes() < MINIMUM_EFFECTIVE_LENGTH) {
-            logger.info("数据不全, 直接返回");
+            logger.debug("数据不全, 直接返回");
             return ;
         }
         byteBuf.markReaderIndex();
@@ -51,7 +53,7 @@ public class NettyMsgDecoder extends ByteToMessageDecoder {
         // 检查 length
         int length = byteBuf.readInt();
         if (byteBuf.readableBytes() < length) {
-            logger.info("数据不全, 重置读指针后返回");
+            logger.debug("数据不全, 重置读指针后返回");
             byteBuf.resetReaderIndex();
             return ;
         }
@@ -72,7 +74,7 @@ public class NettyMsgDecoder extends ByteToMessageDecoder {
         } else if (type == 1) {
             obj = serializer.deserialize(body, RpcResponse.class);
         } else {
-            logger.info("未知消息类型");
+            logger.error("未知消息类型");
         }
         out.add(obj);
     }

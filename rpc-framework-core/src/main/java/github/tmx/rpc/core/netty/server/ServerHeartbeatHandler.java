@@ -33,11 +33,11 @@ public class ServerHeartbeatHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         RpcRequest rpcRequest = (RpcRequest) msg;
         if (!rpcRequest.getMessageTypeEnum().equals(RpcMessageTypeEnum.HEARTBEAT_PING)) {
-            logger.info("收到的是 RPC 请求, 直接放行");
+            logger.debug("收到的是 RPC 请求, 直接放行");
             ctx.fireChannelRead(msg);
             return ;
         }
-        logger.info("收到一个 PING 消息");
+        logger.debug("收到一个 PING 消息");
         try {
             RpcResponse rpcResponse = RpcResponse.success(null, rpcRequest.getRequestId(), true);
             ChannelFuture channelFuture = ctx.writeAndFlush(rpcResponse);

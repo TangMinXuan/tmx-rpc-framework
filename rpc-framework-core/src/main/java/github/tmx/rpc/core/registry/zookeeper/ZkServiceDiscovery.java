@@ -34,11 +34,11 @@ public class ZkServiceDiscovery implements ServiceDiscovery {
     public InetSocketAddress lookupService(String serviceName) {
         List<String> providerList = CuratorUtil.getChildrenNodes(zkClient, serviceName);
         if (providerList.size() <= 0) {
-            logger.info("找不到服务提供者地址");
+            logger.error("找不到服务提供者地址");
             return null;
         }
         String serviceAddress = loadBalance.selectServiceAddress(providerList);
-        logger.info("成功找到服务地址:{}", serviceAddress);
+        logger.debug("成功找到服务地址:{}", serviceAddress);
 
         //按照 ip:port 的格式切分 serviceAddress
         return new InetSocketAddress(serviceAddress.split(":")[0], Integer.parseInt(serviceAddress.split(":")[1]));

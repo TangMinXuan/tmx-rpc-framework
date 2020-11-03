@@ -18,11 +18,11 @@ public final class RpcConfig {
 
     private static final String PROPERTIES_FILE_NAME = "rpc.properties";
 
-    private static final Properties userProperties;
+    private static Properties userProperties;
 
     static {
         // 下面的语句是, 获取调用者的根目录
-        // 获取 core 目录下此类所在的路径: RpcConfig.class.getResources("").getPath
+        // 获取 core 目录下此类所在的路径: RpcConfig.class.getResource("").getPath()
         // 在 idea 中, 被标记为 resources 的文件夹在生成 target 时会被抹去
         // 因此 resources 中的文件都视为在根目录
         String userPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();

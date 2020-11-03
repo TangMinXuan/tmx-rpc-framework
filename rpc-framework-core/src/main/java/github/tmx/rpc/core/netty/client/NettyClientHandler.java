@@ -19,7 +19,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         try {
             RpcResponse rpcResponse = (RpcResponse) msg;
-            logger.info(String.format("客户端收到回应: %s", rpcResponse));
+            logger.debug(String.format("客户端收到回应: %s", rpcResponse));
             // 交付给 future
             RpcResultFuture.complete(rpcResponse);
         } finally {

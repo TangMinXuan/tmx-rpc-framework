@@ -35,11 +35,11 @@ public class ClientHeartbeatHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         RpcResponse rpcResponse = (RpcResponse) msg;
         if (!rpcResponse.getMessageTypeEnum().equals(RpcMessageTypeEnum.HEARTBEAT_PONG)) {
-            logger.info("收到的是 RPC 回应, 直接放行");
+            logger.debug("收到的是 RPC 回应, 直接放行");
             ctx.fireChannelRead(msg);
             return ;
         }
-        logger.info("收到一个 PONG 消息");
+        logger.debug("收到一个 PONG 消息");
     }
 
     /**
@@ -54,8 +54,8 @@ public class ClientHeartbeatHandler extends ChannelInboundHandlerAdapter {
             IdleState state = ((IdleStateEvent) evt).state();
             if (state == IdleState.WRITER_IDLE) {
                 // 触发 写事件 说明, 客户端有一段时间没有发送RPC请求了, 此时发送PING请求维持连接
-                logger.info("客户端触发了 写事件 , 即将发送 PING 请求");
-                if (isPINGReached(ctx.channel())) {
+                logger.debug("客户端触发了 写事件 , 即将发送 PING 请求");
+                if (isPingReached(ctx.channel())) {
                     ctx.close();
                 }
                 RpcRequest rpcRequest = RpcRequest.builder()
@@ -66,7 +66,7 @@ public class ClientHeartbeatHandler extends ChannelInboundHandlerAdapter {
                 channelFuture.addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
             } else if (state == IdleState.READER_IDLE) {
                 // 触发 读事件 说明, 无论是RPC请求, 还是PING请求, 都未能得到服务器的响应, 此时认为服务器宕机
-                logger.info("客户端触发了 读事件 , 客户端认为服务端宕机, 主动关闭连接");
+                logger.debug("客户端触发了 读事件 , 客户端认为服务端宕机, 主动关闭连接");
                 ctx.close();
             }
         } else {
@@ -80,18 +80,18 @@ public class ClientHeartbeatHandler extends ChannelInboundHandlerAdapter {
      * @param channel
      * @return
      */
-    private boolean isPINGReached(Channel channel) {
-        AttributeKey<Integer> ping_count_key = AttributeKey.valueOf("ping_count");
-        if (!channel.hasAttr(ping_count_key) || channel.attr(ping_count_key).get() == null) {
-            logger.info("为首次创建的 channel 设置 PING count 数为0");
-            channel.attr(ping_count_key).set(0);
+    private boolean isPingReached(Channel channel) {
+        AttributeKey<Integer> pingCountKey = AttributeKey.valueOf("ping_count");
+        if (!channel.hasAttr(pingCountKey) || channel.attr(pingCountKey).get() == null) {
+            logger.debug("为首次创建的 channel 设置 PING count 数为0");
+            channel.attr(pingCountKey).set(0);
             return false;
         }
-        Integer count = channel.attr(ping_count_key).get();
-        channel.attr(ping_count_key).set(++count);
-        logger.info("channel Ping 数为: {}", count);
+        Integer count = channel.attr(pingCountKey).get();
+        channel.attr(pingCountKey).set(++count);
+        logger.debug("channel Ping 数为: {}", count);
         if (count >= HEARTBEAT_THRESHOLD) {
-            logger.info("达到阈值, 即将断开连接");
+            logger.debug("达到阈值, 即将断开连接");
             return true;
         }
         return false;

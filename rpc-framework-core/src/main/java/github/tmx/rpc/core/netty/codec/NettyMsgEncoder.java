@@ -1,4 +1,4 @@
-package github.tmx.rpc.core.netty.coded;
+package github.tmx.rpc.core.netty.codec;
 
 import github.tmx.rpc.core.common.DTO.RpcProtocol;
 import github.tmx.rpc.core.common.DTO.RpcRequest;

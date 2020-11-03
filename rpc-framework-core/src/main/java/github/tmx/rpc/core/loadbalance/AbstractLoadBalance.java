@@ -9,15 +9,20 @@ import java.util.List;
 public abstract class AbstractLoadBalance implements LoadBalance {
 
     @Override
-    public String selectServiceAddress(List<String> serviceAddresses) {
-        if (serviceAddresses == null || serviceAddresses.size() == 0) {
+    public String selectServiceAddress(List<String> serviceAddressList) {
+        if (serviceAddressList == null || serviceAddressList.size() == 0) {
             return null;
         }
-        if (serviceAddresses.size() == 1) {
-            return serviceAddresses.get(0);
+        if (serviceAddressList.size() == 1) {
+            return serviceAddressList.get(0);
         }
-        return doSelect(serviceAddresses);
+        return doSelect(serviceAddressList);
     }
 
-    protected abstract String doSelect(List<String> serviceAddresses);
+    /**
+     * 当服务提供者的数目大于1个时, 执行此方法
+     * @param serviceAddressList
+     * @return
+     */
+    protected abstract String doSelect(List<String> serviceAddressList);
 }

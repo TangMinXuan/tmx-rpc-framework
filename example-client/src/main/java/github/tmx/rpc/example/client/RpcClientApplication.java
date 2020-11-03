@@ -12,21 +12,21 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
  * @created: 2020/10/21 16:45
  */
 @EnableRPC
-public class ClientFitSpring {
+public class RpcClientApplication {
 
     @RpcReference
     HelloService helloService;
 
     public static void main(String[] args) {
-        ApplicationContext ctx = new AnnotationConfigApplicationContext(ClientFitSpring.class);
+        ApplicationContext ctx = new AnnotationConfigApplicationContext(RpcClientApplication.class);
 
-        ClientFitSpring clientFitSpring = ctx.getBean(ClientFitSpring.class);
+        RpcClientApplication clientFitSpring = ctx.getBean(RpcClientApplication.class);
 
-        Hello hello_send = new Hello(1, "Hello, server");
-        Hello hello_rec = clientFitSpring.helloService.sayHello(hello_send);
+        Hello helloSend = new Hello(1, "Hello, server");
+        Hello helloRec = clientFitSpring.helloService.sayHello(helloSend);
 
-        if (hello_rec != null) {
-            System.out.println("hello from client: " + "id: " + hello_rec.getId() + " " + "message: " + hello_rec.getMessage());
+        if (helloRec != null) {
+            System.out.println("hello from client: " + "id: " + helloRec.getId() + " " + "message: " + helloRec.getMessage());
         } else {
             System.out.println("RPC调用结果为null");
         }

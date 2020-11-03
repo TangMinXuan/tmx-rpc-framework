@@ -19,7 +19,7 @@ public class ZkServiceRegistry implements ServiceRegistry {
 
     private static final Logger logger = LoggerFactory.getLogger(ZkServiceRegistry.class);
 
-    private static final Set<String> registrySet = new HashSet<>();
+    private static Set<String> registrySet = new HashSet<>();
 
     private String address;
 
@@ -44,14 +44,14 @@ public class ZkServiceRegistry implements ServiceRegistry {
         }
         registrySet.add(servicePath.toString());
         CuratorUtil.createEphemeralNode(CuratorUtil.getZkClient(), servicePath.toString());
-        logger.info("成功创建节点: {}", servicePath);
+        logger.debug("成功创建节点: {}", servicePath);
     }
 
     @Override
     public void cancelService() {
         for (String servicePath : registrySet) {
             CuratorUtil.deleteEphemeralNode(CuratorUtil.getZkClient(), servicePath);
-            logger.info("成功删除: {}", servicePath);
+            logger.debug("成功删除: {}", servicePath);
         }
     }
 }

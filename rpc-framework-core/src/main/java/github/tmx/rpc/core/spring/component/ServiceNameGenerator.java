@@ -11,6 +11,12 @@ import org.springframework.context.annotation.AnnotationBeanNameGenerator;
  */
 public class ServiceNameGenerator extends AnnotationBeanNameGenerator {
 
+    /**
+     * 为注入 Spring 的 RpcService 修改为: 接口全限定名 + [group] + [version]
+     * 默认 beanName 为: 实现类简名(首字母小写)
+     * @param definition
+     * @return
+     */
     @Override
     protected String buildDefaultBeanName(BeanDefinition definition) {
         String beanClassName = definition.getBeanClassName();
@@ -23,9 +29,6 @@ public class ServiceNameGenerator extends AnnotationBeanNameGenerator {
         if (clazz.isAnnotationPresent(RpcService.class) && clazz.getInterfaces().length > 0) {
             RpcService rpcService = clazz.getAnnotation(RpcService.class);
             String interfaceName = clazz.getInterfaces()[0].getCanonicalName();
-            System.out.println("interfaceName = " + interfaceName);
-            System.out.println(rpcService.group());
-            System.out.println(rpcService.version());
             return BeanNameUtil.getBeanName(interfaceName, rpcService.group(), rpcService.version());
         }
 

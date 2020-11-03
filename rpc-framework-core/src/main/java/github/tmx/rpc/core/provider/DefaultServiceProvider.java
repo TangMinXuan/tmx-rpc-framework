@@ -6,12 +6,18 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author: TangMinXuan
+ */
 public class DefaultServiceProvider implements ServiceProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultServiceProvider.class);
 
-    // key-value: interfaceName-interfaceImplObject
-    private static final Map<String, Object> providerMap = new HashMap<>();
+    /**
+     * key: 接口名
+     * value: 接口实现类对象
+     */
+    private static Map<String, Object> providerMap = new HashMap<>();
 
     @Override
     public void addProvider(Object service) {
