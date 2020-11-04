@@ -1,1 +1,2 @@
-Random=github.tmx.rpc.core.loadbalance.RandomLoadBalance
+Random=github.tmx.rpc.core.loadbalance.impl.RandomLoadBalance
+ConsistentHash=github.tmx.rpc.core.loadbalance.impl.ConsistentHashLoadBalance

@@ -37,7 +37,7 @@ public class ZkServiceDiscovery implements ServiceDiscovery {
             logger.error("找不到服务提供者地址");
             return null;
         }
-        String serviceAddress = loadBalance.selectServiceAddress(providerList);
+        String serviceAddress = loadBalance.selectServiceAddress(providerList, serviceName);
         logger.debug("成功找到服务地址:{}", serviceAddress);
 
         //按照 ip:port 的格式切分 serviceAddress

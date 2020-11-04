@@ -14,10 +14,13 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.StandardAnnotationMetadata;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.Enumeration;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author: TangMinXuan
@@ -68,17 +71,22 @@ public class RpcBeanRegistrar implements ImportBeanDefinitionRegistrar, Resource
     }
 
     private void bannerPrint() {
-        String path = RpcBeanRegistrar.class.getResource("/banner").getPath();
-        File file;
-        try (FileReader fileReader = new FileReader(path)) {
-            char[] cache = new char[1024];
-            int length = fileReader.read(cache);
-            String banner = new String(cache, 0, length);
-            System.out.println(banner);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        String fileName = "META-INF/banner";
+        ClassLoader classLoader = RpcBeanRegistrar.class.getClassLoader();
+        Enumeration<URL> urls = null;
+        try {
+            urls = classLoader.getResources(fileName);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        URL resourceUrl = urls.nextElement();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(resourceUrl.openStream(), UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            logger.error(e.getMessage());
         }
     }
 }

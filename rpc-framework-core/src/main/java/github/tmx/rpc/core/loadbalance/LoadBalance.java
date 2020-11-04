@@ -14,7 +14,8 @@ public interface LoadBalance {
     /**
      * 对传入的服务提供者 List 做相应策略的选择
      * @param serviceAddressList
+     * @param serviceName
      * @return
      */
-    String selectServiceAddress(List<String> serviceAddressList);
+    String selectServiceAddress(List<String> serviceAddressList, String serviceName);
 }

@@ -1,4 +1,6 @@
-package github.tmx.rpc.core.loadbalance;
+package github.tmx.rpc.core.loadbalance.impl;
+
+import github.tmx.rpc.core.loadbalance.AbstractLoadBalance;
 
 import java.util.List;
 import java.util.Random;
@@ -10,7 +12,7 @@ import java.util.Random;
 public class RandomLoadBalance extends AbstractLoadBalance {
 
     @Override
-    protected String doSelect(List<String> serviceAddressList) {
+    protected String doSelect(List<String> serviceAddressList, String serviceName) {
         Random random = new Random();
         return serviceAddressList.get(random.nextInt(serviceAddressList.size()));
     }
