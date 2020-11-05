@@ -1,7 +1,7 @@
 package github.tmx.rpc.core.registry.zookeeper;
 
-import github.tmx.rpc.core.config.RpcConfig;
-import github.tmx.rpc.core.config.RpcPropertyEnum;
+import github.tmx.rpc.core.config.ConfigurationEnum;
+import github.tmx.rpc.core.config.FrameworkConfiguration;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -39,10 +39,10 @@ public final class CuratorUtil {
      */
     private static int CONNECTION_TIMEOUT_MS = 10 * 1000;
     private static int SESSION_TIMEOUT_MS = 30 * 1000;
-    public static String ROOT_PATH = RpcConfig.getProperty(RpcPropertyEnum.ZK_ROOT_PATH);
-    private static String ZK_ADDRESS = RpcConfig.getProperty(RpcPropertyEnum.ZK_ADDRESS);
-    private static int RETRY_INTERVAL = Integer.valueOf(RpcConfig.getProperty(RpcPropertyEnum.ZK_RETRY_INTERVAL));
-    private static int RETRY_COUNT = Integer.valueOf(RpcConfig.getProperty(RpcPropertyEnum.ZK_RETRY_COUNT));
+    public static String ROOT_PATH = FrameworkConfiguration.getProperty(ConfigurationEnum.ZK_ROOT_PATH);
+    private static String ZK_ADDRESS = FrameworkConfiguration.getProperty(ConfigurationEnum.ZK_ADDRESS);
+    private static int RETRY_INTERVAL = Integer.valueOf(FrameworkConfiguration.getProperty(ConfigurationEnum.ZK_RETRY_INTERVAL));
+    private static int RETRY_COUNT = Integer.valueOf(FrameworkConfiguration.getProperty(ConfigurationEnum.ZK_RETRY_COUNT));
 
     public static CuratorFramework getZkClient() {
         if (zkClient != null && zkClient.getState() == CuratorFrameworkState.STARTED) {
@@ -146,7 +146,7 @@ public final class CuratorUtil {
      * @return
      */
     private static String correctRootPath() {
-        String read = RpcConfig.getProperty(RpcPropertyEnum.ZK_ROOT_PATH);
+        String read = FrameworkConfiguration.getProperty(ConfigurationEnum.ZK_ROOT_PATH);
         StringBuilder builder = new StringBuilder();
         if (read.charAt(0) != '/') {
             builder.append("/");

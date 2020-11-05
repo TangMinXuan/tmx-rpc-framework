@@ -1,7 +1,7 @@
 package github.tmx.rpc.core.registry.zookeeper;
 
-import github.tmx.rpc.core.config.RpcConfig;
-import github.tmx.rpc.core.config.RpcPropertyEnum;
+import github.tmx.rpc.core.config.ConfigurationEnum;
+import github.tmx.rpc.core.config.FrameworkConfiguration;
 import github.tmx.rpc.core.registry.ServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ public class ZkServiceRegistry implements ServiceRegistry {
     public ZkServiceRegistry() {
         try {
             address = InetAddress.getLocalHost().getHostAddress() + ":"
-                    + RpcConfig.getProperty(RpcPropertyEnum.SERVER_PORT);
+                    + FrameworkConfiguration.getProperty(ConfigurationEnum.SERVER_PORT);
         } catch (UnknownHostException e) {
             logger.error("获取服务器所在地址发生错误: ", e);
         }

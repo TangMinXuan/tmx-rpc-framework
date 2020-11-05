@@ -3,8 +3,8 @@ package github.tmx.rpc.core.netty.client;
 import github.tmx.rpc.core.common.DTO.RpcRequest;
 import github.tmx.rpc.core.common.DTO.RpcResponse;
 import github.tmx.rpc.core.common.enumeration.RpcMessageTypeEnum;
-import github.tmx.rpc.core.config.RpcConfig;
-import github.tmx.rpc.core.config.RpcPropertyEnum;
+import github.tmx.rpc.core.config.ConfigurationEnum;
+import github.tmx.rpc.core.config.FrameworkConfiguration;
 import io.netty.channel.*;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
@@ -23,7 +23,7 @@ public class ClientHeartbeatHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientHeartbeatHandler.class);
 
-    private static Integer HEARTBEAT_THRESHOLD = Integer.valueOf(RpcConfig.getProperty(RpcPropertyEnum.CLIENT_HEARTBEAT_THRESHOLD));
+    private static Integer HEARTBEAT_THRESHOLD = Integer.valueOf(FrameworkConfiguration.getProperty(ConfigurationEnum.CLIENT_HEARTBEAT_THRESHOLD));
 
     /**
      * 如果是 RPC 请求的回应消息, 直接放行

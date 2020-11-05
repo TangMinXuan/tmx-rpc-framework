@@ -15,7 +15,10 @@ public class RpcProtocol {
     public static final byte VERSION = 1;
 
     private int length;
-    private byte codec;
+
+    private byte codecLength;
+    private byte[] codec;
+
     private byte type;
     private byte[] body;
 }

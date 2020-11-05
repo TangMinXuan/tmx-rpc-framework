@@ -9,7 +9,10 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
-public enum RpcPropertyEnum {
+public enum ConfigurationEnum {
+
+    // 序列化组件
+    SERIALIZER("rpc.serializer", "Protostuff"),
 
     // Zookeeper 地址
     ZK_ADDRESS("rpc.zookeeper.address", "127.0.0.1:2181"),

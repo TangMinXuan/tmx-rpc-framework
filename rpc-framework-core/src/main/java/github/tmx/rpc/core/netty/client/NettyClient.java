@@ -3,8 +3,8 @@ package github.tmx.rpc.core.netty.client;
 import github.tmx.rpc.core.common.DTO.RpcRequest;
 import github.tmx.rpc.core.common.DTO.RpcResponse;
 import github.tmx.rpc.core.common.enumeration.RpcResponseEnum;
-import github.tmx.rpc.core.config.RpcConfig;
-import github.tmx.rpc.core.config.RpcPropertyEnum;
+import github.tmx.rpc.core.config.ConfigurationEnum;
+import github.tmx.rpc.core.config.FrameworkConfiguration;
 import github.tmx.rpc.core.extension.ExtensionLoader;
 import github.tmx.rpc.core.netty.codec.NettyMsgDecoder;
 import github.tmx.rpc.core.netty.codec.NettyMsgEncoder;
@@ -40,10 +40,10 @@ public class NettyClient implements RpcClient {
     private final Map<InetSocketAddress, Channel> channelCacheMap;
     private final ServiceDiscovery serviceDiscovery;
 
-    private final int RETRY_INTERVAL = Integer.valueOf(RpcConfig.getProperty(RpcPropertyEnum.CLIENT_RETRY_INTERVAL));
-    private final int RETRY_COUNT = Integer.valueOf(RpcConfig.getProperty(RpcPropertyEnum.CLIENT_RETRY_COUNT));
-    private final int PING_INTERVAL = Integer.valueOf(RpcConfig.getProperty(RpcPropertyEnum.CLIENT_PING_INTERVAL));
-    private final int MAX_PAUSE_TIME = Integer.valueOf(RpcConfig.getProperty(RpcPropertyEnum.CLIENT_MAX_PAUSE_TIME));
+    private final int RETRY_INTERVAL = Integer.valueOf(FrameworkConfiguration.getProperty(ConfigurationEnum.CLIENT_RETRY_INTERVAL));
+    private final int RETRY_COUNT = Integer.valueOf(FrameworkConfiguration.getProperty(ConfigurationEnum.CLIENT_RETRY_COUNT));
+    private final int PING_INTERVAL = Integer.valueOf(FrameworkConfiguration.getProperty(ConfigurationEnum.CLIENT_PING_INTERVAL));
+    private final int MAX_PAUSE_TIME = Integer.valueOf(FrameworkConfiguration.getProperty(ConfigurationEnum.CLIENT_MAX_PAUSE_TIME));
 
     private Bootstrap bootstrap;
 

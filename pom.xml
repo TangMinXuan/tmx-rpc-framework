@@ -26,7 +26,10 @@
         <slf4j.version>1.7.25</slf4j.version>
         <!--Netty-->
         <netty.version>4.1.42.Final</netty.version>
+        <!--Kryo-->
         <kryo.version>4.0.2</kryo.version>
+        <!--Protostuff-->
+        <protostuff.version>1.7.2</protostuff.version>
         <!--tools-->
         <guava.version>29.0-jre</guava.version>
         <!-- test -->

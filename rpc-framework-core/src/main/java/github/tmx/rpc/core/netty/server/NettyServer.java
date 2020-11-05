@@ -1,7 +1,7 @@
 package github.tmx.rpc.core.netty.server;
 
-import github.tmx.rpc.core.config.RpcConfig;
-import github.tmx.rpc.core.config.RpcPropertyEnum;
+import github.tmx.rpc.core.config.ConfigurationEnum;
+import github.tmx.rpc.core.config.FrameworkConfiguration;
 import github.tmx.rpc.core.extension.ExtensionLoader;
 import github.tmx.rpc.core.netty.codec.NettyMsgDecoder;
 import github.tmx.rpc.core.netty.codec.NettyMsgEncoder;
@@ -33,8 +33,8 @@ public class NettyServer {
     private ServerBootstrap bootstrap;
     private final ServiceRegistry serviceRegistry;
     private final ServiceProvider serviceProvider;
-    private final int PORT = Integer.valueOf(RpcConfig.getProperty(RpcPropertyEnum.SERVER_PORT));
-    private final int MAX_PAUSE_TIME = Integer.valueOf(RpcConfig.getProperty(RpcPropertyEnum.SERVER_MAX_PAUSE_TIME));
+    private final int PORT = Integer.valueOf(FrameworkConfiguration.getProperty(ConfigurationEnum.SERVER_PORT));
+    private final int MAX_PAUSE_TIME = Integer.valueOf(FrameworkConfiguration.getProperty(ConfigurationEnum.SERVER_MAX_PAUSE_TIME));
 
     private NettyServer() {
         // 注册中心

@@ -1,7 +1,7 @@
 package github.tmx.rpc.core.registry.zookeeper;
 
-import github.tmx.rpc.core.config.RpcConfig;
-import github.tmx.rpc.core.config.RpcPropertyEnum;
+import github.tmx.rpc.core.config.ConfigurationEnum;
+import github.tmx.rpc.core.config.FrameworkConfiguration;
 import github.tmx.rpc.core.extension.ExtensionLoader;
 import github.tmx.rpc.core.loadbalance.LoadBalance;
 import github.tmx.rpc.core.registry.ServiceDiscovery;
@@ -26,7 +26,7 @@ public class ZkServiceDiscovery implements ServiceDiscovery {
     public ZkServiceDiscovery() {
         // 实例化时就连接 Zookeeper 注册中心, 防止调用过程需要等待连接 Zk
         zkClient = CuratorUtil.getZkClient();
-        String loadBalanceStrategy = RpcConfig.getProperty(RpcPropertyEnum.CLIENT_LOAD_BALANCE);
+        String loadBalanceStrategy = FrameworkConfiguration.getProperty(ConfigurationEnum.CLIENT_LOAD_BALANCE);
         loadBalance = ExtensionLoader.getExtensionLoader(LoadBalance.class).getExtension(loadBalanceStrategy);
     }
 

@@ -3,6 +3,7 @@ package github.tmx.rpc.core.netty.codec;
 import github.tmx.rpc.core.common.DTO.RpcProtocol;
 import github.tmx.rpc.core.common.DTO.RpcRequest;
 import github.tmx.rpc.core.common.DTO.RpcResponse;
+import github.tmx.rpc.core.common.exception.SerializeException;
 import github.tmx.rpc.core.extension.ExtensionLoader;
 import github.tmx.rpc.core.serialize.Serializer;
 import io.netty.buffer.ByteBuf;
@@ -22,10 +23,11 @@ public class NettyMsgDecoder extends ByteToMessageDecoder {
     private static final Logger logger = LoggerFactory.getLogger(NettyMsgDecoder.class);
 
     /**
-     * 最短有效长度
+     * 最短有效长度 = 4(魔数) + 1(协议版本) + 4(后续内容长度int) = 9
      */
-    private static final int MINIMUM_EFFECTIVE_LENGTH = 14;
-    private Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension("Kryo");
+    private static final int MINIMUM_EFFECTIVE_LENGTH = 9;
+
+    private Serializer serializer;
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {
@@ -39,15 +41,13 @@ public class NettyMsgDecoder extends ByteToMessageDecoder {
         byte[] magicNum = new byte[4];
         byteBuf.readBytes(magicNum);
         if (!checkMagicNum(magicNum)) {
-            logger.error("数据 魔数 错误");
-            return ;
+            throw new SerializeException("数据魔数错误");
         }
 
         // 检查协议版本
         byte version = byteBuf.readByte();
         if (version != (byte) 1) {
-            logger.error("数据 协议版本 错误");
-            return ;
+            throw new SerializeException("数据协议版本错误");
         }
 
         // 检查 length
@@ -59,13 +59,18 @@ public class NettyMsgDecoder extends ByteToMessageDecoder {
         }
 
         // 序列化工具 codec
-        byte codec = byteBuf.readByte();
+        int codecLength = byteBuf.readByte();
+        byte[] codec = new byte[codecLength];
+        byteBuf.readBytes(codec);
+        String codecStr = new String(codec);
+        serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension(codecStr);
+
 
         // 消息类型: 0-request, 1-response
         byte type = byteBuf.readByte();
 
         // 反序列 body 的内容
-        int bodyLen = length - 2;
+        int bodyLen = length - 2 - codecLength;
         byte[] body = new byte[bodyLen];
         byteBuf.readBytes(body);
         Object obj = null;
@@ -74,7 +79,7 @@ public class NettyMsgDecoder extends ByteToMessageDecoder {
         } else if (type == 1) {
             obj = serializer.deserialize(body, RpcResponse.class);
         } else {
-            logger.error("未知消息类型");
+            throw new SerializeException("未知的 type 类型");
         }
         out.add(obj);
     }

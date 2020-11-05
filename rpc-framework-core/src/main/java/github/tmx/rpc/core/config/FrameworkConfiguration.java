@@ -12,9 +12,9 @@ import java.util.Properties;
  * @author: TangMinXuan
  * @created: 2020/10/24 20:46
  */
-public final class RpcConfig {
+public final class FrameworkConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(RpcConfig.class);
+    private static final Logger logger = LoggerFactory.getLogger(FrameworkConfiguration.class);
 
     private static final String PROPERTIES_FILE_NAME = "rpc.properties";
 
@@ -22,14 +22,14 @@ public final class RpcConfig {
 
     static {
         // 下面的语句是, 获取调用者的根目录
-        // 获取 core 目录下此类所在的路径: RpcConfig.class.getResource("").getPath()
+        // 获取 core 目录下此类所在的路径: FrameworkConfiguration.class.getResource("").getPath()
         // 在 idea 中, 被标记为 resources 的文件夹在生成 target 时会被抹去
         // 因此 resources 中的文件都视为在根目录
         String userPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
         userProperties = readPropertiesFile(userPath);
     }
 
-    private RpcConfig() {
+    private FrameworkConfiguration() {
 
     }
 
@@ -47,7 +47,7 @@ public final class RpcConfig {
         return properties;
     }
 
-    public static String getProperty(RpcPropertyEnum property) {
+    public static String getProperty(ConfigurationEnum property) {
         return userProperties.getProperty(property.getName(), property.getDefaultValue());
     }
 }

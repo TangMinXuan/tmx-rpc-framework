@@ -3,6 +3,8 @@ package github.tmx.rpc.core.netty.codec;
 import github.tmx.rpc.core.common.DTO.RpcProtocol;
 import github.tmx.rpc.core.common.DTO.RpcRequest;
 import github.tmx.rpc.core.common.DTO.RpcResponse;
+import github.tmx.rpc.core.config.ConfigurationEnum;
+import github.tmx.rpc.core.config.FrameworkConfiguration;
 import github.tmx.rpc.core.extension.ExtensionLoader;
 import github.tmx.rpc.core.serialize.Serializer;
 import io.netty.buffer.ByteBuf;
@@ -15,20 +17,23 @@ import io.netty.handler.codec.MessageToByteEncoder;
  */
 public class NettyMsgEncoder extends MessageToByteEncoder {
 
-    private Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension("Kryo");
+    private final String SERIALIZER = FrameworkConfiguration.getProperty(ConfigurationEnum.SERIALIZER);
+    private Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension(SERIALIZER);
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Object obj, ByteBuf out) throws Exception {
         out.writeBytes(RpcProtocol.MAGIC_NUM);
         out.writeByte(RpcProtocol.VERSION);
 
-        // length
+        // length = 1(codecLength) + 1(type) + body(字节数组) + codec名字(字节数组)
         byte[] body = serializer.serialize(obj);
-        int length = 2 + body.length;
+        int length = 2 + body.length + SERIALIZER.length();
         out.writeInt(length);
 
-        // codec
-        out.writeByte(0);
+        // codec 组件名的长度(占1字节)
+        out.writeByte(SERIALIZER.length());
+        // codec 组件名
+        out.writeBytes(SERIALIZER.getBytes());
 
         // type
         if (obj instanceof RpcRequest) {
