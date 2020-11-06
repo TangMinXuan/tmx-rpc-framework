@@ -2,10 +2,10 @@ package github.tmx.rpc.core.netty.server;
 
 import github.tmx.rpc.core.config.ConfigurationEnum;
 import github.tmx.rpc.core.config.FrameworkConfiguration;
+import github.tmx.rpc.core.container.ServiceContainer;
 import github.tmx.rpc.core.extension.ExtensionLoader;
 import github.tmx.rpc.core.netty.codec.NettyMsgDecoder;
 import github.tmx.rpc.core.netty.codec.NettyMsgEncoder;
-import github.tmx.rpc.core.provider.ServiceProvider;
 import github.tmx.rpc.core.registry.ServiceRegistry;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -32,7 +32,7 @@ public class NettyServer {
 
     private ServerBootstrap bootstrap;
     private final ServiceRegistry serviceRegistry;
-    private final ServiceProvider serviceProvider;
+    private final ServiceContainer serviceContainer;
     private final int PORT = Integer.valueOf(FrameworkConfiguration.getProperty(ConfigurationEnum.SERVER_PORT));
     private final int MAX_PAUSE_TIME = Integer.valueOf(FrameworkConfiguration.getProperty(ConfigurationEnum.SERVER_MAX_PAUSE_TIME));
 
@@ -40,7 +40,7 @@ public class NettyServer {
         // 注册中心
         serviceRegistry = ExtensionLoader.getExtensionLoader(ServiceRegistry.class).getExtension("Zookeeper");
         // 容器
-        serviceProvider = ExtensionLoader.getExtensionLoader(ServiceProvider.class).getExtension("Spring");
+        serviceContainer = ExtensionLoader.getExtensionLoader(ServiceContainer.class).getExtension("Spring");
 
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         EventLoopGroup bossGroup = new NioEventLoopGroup();
@@ -95,7 +95,7 @@ public class NettyServer {
      * @param service 服务接口实现类
      */
     public void publishService(Object service) {
-        serviceProvider.addProvider(service);
+        serviceContainer.addProvider(service);
     }
 
     /**
@@ -111,7 +111,7 @@ public class NettyServer {
         return serviceRegistry;
     }
 
-    public ServiceProvider getServiceProvider() {
-        return serviceProvider;
+    public ServiceContainer getServiceContainer() {
+        return serviceContainer;
     }
 }

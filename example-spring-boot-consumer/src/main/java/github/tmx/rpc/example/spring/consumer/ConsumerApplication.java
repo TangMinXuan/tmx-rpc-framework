@@ -1,6 +1,6 @@
 package github.tmx.rpc.example.spring.consumer;
 
-import github.tmx.rpc.core.spring.annotion.EnableRPC;
+import github.tmx.rpc.core.spring.annotation.EnableRPC;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

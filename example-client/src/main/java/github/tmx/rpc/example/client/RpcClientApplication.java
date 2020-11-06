@@ -2,8 +2,8 @@ package github.tmx.rpc.example.client;
 
 import github.tmx.example.api.Hello;
 import github.tmx.example.api.HelloService;
-import github.tmx.rpc.core.spring.annotion.EnableRPC;
-import github.tmx.rpc.core.spring.annotion.RpcReference;
+import github.tmx.rpc.core.spring.annotation.EnableRPC;
+import github.tmx.rpc.core.spring.annotation.RpcReference;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

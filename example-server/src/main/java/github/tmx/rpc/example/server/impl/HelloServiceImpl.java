@@ -2,7 +2,7 @@ package github.tmx.rpc.example.server.impl;
 
 import github.tmx.example.api.Hello;
 import github.tmx.example.api.HelloService;
-import github.tmx.rpc.core.spring.annotion.RpcService;
+import github.tmx.rpc.core.spring.annotation.RpcService;
 
 /**
  * @author: TangMinXuan

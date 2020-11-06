@@ -1,7 +1,7 @@
 package github.tmx.rpc.core.spring;
 
-import github.tmx.rpc.core.spring.annotion.EnableRPC;
-import github.tmx.rpc.core.spring.annotion.RpcService;
+import github.tmx.rpc.core.spring.annotation.EnableRPC;
+import github.tmx.rpc.core.spring.annotation.RpcService;
 import github.tmx.rpc.core.spring.component.ServiceNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

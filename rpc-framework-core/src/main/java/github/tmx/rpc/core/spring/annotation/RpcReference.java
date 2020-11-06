@@ -1,4 +1,4 @@
-package github.tmx.rpc.core.spring.annotion;
+package github.tmx.rpc.core.spring.annotation;
 
 import org.springframework.stereotype.Component;
 

@@ -1,7 +1,7 @@
 package github.tmx.rpc.core.spring.component;
 
 import github.tmx.rpc.core.netty.client.NettyRpcClientProxy;
-import github.tmx.rpc.core.spring.annotion.RpcReference;
+import github.tmx.rpc.core.spring.annotation.RpcReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;

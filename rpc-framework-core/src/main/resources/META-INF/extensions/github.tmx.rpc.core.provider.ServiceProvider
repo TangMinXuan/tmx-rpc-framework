@@ -1,2 +1,0 @@
-Spring=github.tmx.rpc.core.spring.component.SpringServiceProvider
-Default=github.tmx.rpc.core.provider.DefaultServiceProvider

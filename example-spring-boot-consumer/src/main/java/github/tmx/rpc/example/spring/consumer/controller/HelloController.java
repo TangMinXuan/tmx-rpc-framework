@@ -2,7 +2,7 @@ package github.tmx.rpc.example.spring.consumer.controller;
 
 import github.tmx.example.api.Hello;
 import github.tmx.example.api.HelloService;
-import github.tmx.rpc.core.spring.annotion.RpcReference;
+import github.tmx.rpc.core.spring.annotation.RpcReference;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

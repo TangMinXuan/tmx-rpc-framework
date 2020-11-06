@@ -1,4 +1,4 @@
-package github.tmx.rpc.core.provider;
+package github.tmx.rpc.core.container;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,9 +9,9 @@ import java.util.Map;
 /**
  * @author: TangMinXuan
  */
-public class DefaultServiceProvider implements ServiceProvider {
+public class DefaultServiceContainer implements ServiceContainer {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultServiceProvider.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultServiceContainer.class);
 
     /**
      * key: 接口名

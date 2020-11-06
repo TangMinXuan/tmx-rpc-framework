@@ -1,0 +1,2 @@
+Spring=github.tmx.rpc.core.spring.component.SpringServiceContainer
+Default=github.tmx.rpc.core.container.DefaultServiceContainer

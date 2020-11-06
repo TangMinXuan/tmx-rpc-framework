@@ -1,4 +1,4 @@
-package github.tmx.rpc.core.spring.annotion;
+package github.tmx.rpc.core.spring.annotation;
 
 import github.tmx.rpc.core.spring.RpcBeanRegistrar;
 import org.springframework.context.annotation.Import;

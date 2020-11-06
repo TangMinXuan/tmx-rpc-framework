@@ -1,7 +1,7 @@
 package github.tmx.rpc.core.spring.component;
 
 import github.tmx.rpc.core.spring.BeanNameUtil;
-import github.tmx.rpc.core.spring.annotion.RpcService;
+import github.tmx.rpc.core.spring.annotation.RpcService;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 

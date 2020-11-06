@@ -2,7 +2,7 @@ package github.tmx.rpc.core.netty.server;
 
 import github.tmx.rpc.core.common.DTO.RpcRequest;
 import github.tmx.rpc.core.common.DTO.RpcResponse;
-import github.tmx.rpc.core.provider.ServiceProvider;
+import github.tmx.rpc.core.container.ServiceContainer;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -19,7 +19,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(NettyServerHandler.class);
 
-    private static ServiceProvider serviceProvider = NettyServer.getInstance().getServiceProvider();
+    private static ServiceContainer serviceContainer = NettyServer.getInstance().getServiceContainer();
 
     private ReflectInvoke reflectInvoke = new ReflectInvoke();
 
@@ -39,7 +39,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
             String interfaceName = rpcRequest.getInterfaceName();
             String group = rpcRequest.getGroup();
             String version = rpcRequest.getVersion();
-            Object serviceImpl = serviceProvider.getProvider(interfaceName, group, version);
+            Object serviceImpl = serviceContainer.getProvider(interfaceName, group, version);
             Object result = reflectInvoke.invokeTargetMethod(rpcRequest, serviceImpl);
             logger.debug("服务器执行结果: {}", result.toString());
 

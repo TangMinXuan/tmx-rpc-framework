@@ -1,4 +1,4 @@
-package github.tmx.rpc.core.provider;
+package github.tmx.rpc.core.container;
 
 import github.tmx.rpc.core.extension.SPI;
 
@@ -7,7 +7,7 @@ import github.tmx.rpc.core.extension.SPI;
  * @author: TangMinXuan
  */
 @SPI
-public interface ServiceProvider {
+public interface ServiceContainer {
 
     /**
      * 添加 实现类 进入 容器

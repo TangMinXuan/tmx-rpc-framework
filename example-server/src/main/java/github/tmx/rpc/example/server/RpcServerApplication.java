@@ -1,6 +1,6 @@
 package github.tmx.rpc.example.server;
 
-import github.tmx.rpc.core.spring.annotion.EnableRPC;
+import github.tmx.rpc.core.spring.annotation.EnableRPC;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
