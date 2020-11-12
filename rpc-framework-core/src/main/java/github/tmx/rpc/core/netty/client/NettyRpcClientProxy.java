@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -22,11 +25,11 @@ import java.util.concurrent.TimeoutException;
 public class NettyRpcClientProxy implements InvocationHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(NettyRpcClientProxy.class);
-
     private static final Integer INVOKE_TIME = 30000;
     private final RpcClient rpcClient;
     private final String group;
     private final String version;
+    private Map<Class, Object> proxyObjectCacheMap = new HashMap<>();
 
     public NettyRpcClientProxy(String group, String version) {
         // 多个 nettyRpcClientProxy 共用一个 nettyClient 对象
@@ -35,8 +38,15 @@ public class NettyRpcClientProxy implements InvocationHandler {
         this.version = version;
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T getProxyInstance(Class<T> clazz) {
-        return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, this);
+        // 缓存 proxy 对象避免频繁的反射导致 OOM
+        if (proxyObjectCacheMap.containsKey(clazz)) {
+            return (T) proxyObjectCacheMap.get(clazz);
+        }
+        T proxyObject = (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, this);
+        proxyObjectCacheMap.put(clazz, proxyObject);
+        return proxyObject;
     }
 
     @Override
@@ -64,6 +74,6 @@ public class NettyRpcClientProxy implements InvocationHandler {
         }
 
         ResponseChecker.check(rpcResponse, rpcRequest);
-        return rpcResponse.getData();
+        return Objects.requireNonNull(rpcResponse).getData();
     }
 }
