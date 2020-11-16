@@ -1,6 +1,6 @@
 package github.tmx.rpc.core.netty.codec;
 
-import github.tmx.rpc.core.common.DTO.RpcProtocol;
+import github.tmx.rpc.core.common.DTO.Protocol;
 import github.tmx.rpc.core.common.DTO.RpcRequest;
 import github.tmx.rpc.core.common.DTO.RpcResponse;
 import github.tmx.rpc.core.common.exception.SerializeException;
@@ -27,10 +27,8 @@ public class NettyMsgDecoder extends ByteToMessageDecoder {
      */
     private static final int MINIMUM_EFFECTIVE_LENGTH = 9;
 
-    private Serializer serializer;
-
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
         if (byteBuf.readableBytes() < MINIMUM_EFFECTIVE_LENGTH) {
             logger.debug("数据不全, 直接返回");
             return ;
@@ -63,7 +61,7 @@ public class NettyMsgDecoder extends ByteToMessageDecoder {
         byte[] codec = new byte[codecLength];
         byteBuf.readBytes(codec);
         String codecStr = new String(codec);
-        serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension(codecStr);
+        Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension(codecStr);
 
 
         // 消息类型: 0-request, 1-response
@@ -73,7 +71,7 @@ public class NettyMsgDecoder extends ByteToMessageDecoder {
         int bodyLen = length - 2 - codecLength;
         byte[] body = new byte[bodyLen];
         byteBuf.readBytes(body);
-        Object obj = null;
+        Object obj;
         if (type == 0) {
             obj = serializer.deserialize(body, RpcRequest.class);
         } else if (type == 1) {
@@ -87,7 +85,7 @@ public class NettyMsgDecoder extends ByteToMessageDecoder {
     private boolean checkMagicNum(byte[] magicNum) {
         for (int i = 0; i < magicNum.length; i++) {
             byte cur = magicNum[i];
-            if (cur != RpcProtocol.MAGIC_NUM[i]) {
+            if (cur != Protocol.MAGIC_NUM[i]) {
                 return false;
             }
         }

@@ -1,6 +1,6 @@
 package github.tmx.rpc.core.netty.codec;
 
-import github.tmx.rpc.core.common.DTO.RpcProtocol;
+import github.tmx.rpc.core.common.DTO.Protocol;
 import github.tmx.rpc.core.common.DTO.RpcRequest;
 import github.tmx.rpc.core.common.DTO.RpcResponse;
 import github.tmx.rpc.core.config.ConfigurationEnum;
@@ -21,9 +21,9 @@ public class NettyMsgEncoder extends MessageToByteEncoder {
     private Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension(SERIALIZER);
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Object obj, ByteBuf out) throws Exception {
-        out.writeBytes(RpcProtocol.MAGIC_NUM);
-        out.writeByte(RpcProtocol.VERSION);
+    protected void encode(ChannelHandlerContext ctx, Object obj, ByteBuf out) {
+        out.writeBytes(Protocol.MAGIC_NUM);
+        out.writeByte(Protocol.VERSION);
 
         // length = 1(codecLength) + 1(type) + body(字节数组) + codec名字(字节数组)
         byte[] body = serializer.serialize(obj);
