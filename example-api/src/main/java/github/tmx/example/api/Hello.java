@@ -2,6 +2,8 @@ package github.tmx.example.api;
 
 import lombok.*;
 
+import java.io.Serializable;
+
 /**
  * @author: TangMinXuan
  * @created: 2020/10/12 15:02
@@ -12,7 +14,7 @@ import lombok.*;
 @Setter
 @Builder
 @ToString
-public class Hello {
+public class Hello implements Serializable {
     private Integer id;
     private String message;
 }

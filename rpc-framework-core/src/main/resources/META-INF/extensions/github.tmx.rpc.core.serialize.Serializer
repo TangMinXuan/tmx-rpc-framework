@@ -1,2 +1,3 @@
 Kryo=github.tmx.rpc.core.serialize.kryo.KryoSerializer
 Protostuff=github.tmx.rpc.core.serialize.protostuff.ProtostuffSerializer
+Hessian=github.tmx.rpc.core.serialize.hessian.HessianSerializer

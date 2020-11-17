@@ -34,6 +34,12 @@
             <artifactId>protostuff-runtime</artifactId>
             <version>${protostuff.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.caucho</groupId>
+            <artifactId>hessian</artifactId>
+            <version>${hessian.version}</version>
+        </dependency>
     </dependencies>
 
 </project>
