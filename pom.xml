@@ -15,6 +15,7 @@
         <module>example-client</module>
         <module>example-spring-boot-consumer</module>
         <module>example-spring-boot-provider</module>
+        <module>example-spi</module>
     </modules>
 
     <properties>
@@ -38,6 +39,7 @@
         <junit.platform.version>1.5.2</junit.platform.version>
         <!-- Spring -->
         <spring.version>5.2.7.RELEASE</spring.version>
+        <javassist>3.27.0-GA</javassist>
     </properties>
 
     <dependencies>
