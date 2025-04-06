@@ -95,8 +95,10 @@
 ### 重要组件
 - **Netty** 是网络通信组件, 为上层提供 NIO 的通信方式, 此外, 双向心跳机制和对通信协议的封装也是基于 Netty 来实现的.
 
-- **Zookeeper** 是作为框架的注册中心, 得益于 Zookeeper 的 Watcher 设计, 服务提供者(provider)在注册与注销服务时, 
+- **Zookeeper** 框架注册中心的一种实现, 得益于 Zookeeper 的 Watcher 设计, 服务提供者(provider)在注册与注销服务时, 
 订阅相应接口的服务消费者(consumer)都能得到及时的反馈. 
+
+- **Nacos** 框架的注册中心的一种实现, 相较于Zookeeper实现CAP理论中的CP, Nacos实现的是AP, 更适合服务节点频繁上下线的情况
 
 - **Protostuff** 是默认的序列化组件, Protostuff 是由 Protobuf 改进来的, 选择 Protostuff 的一个很重要原因是如果不考虑跨语言, 
 Protostuff 的序列化/反序列化速度在一众序列化组件中名列前茅, 我还适配了 Kryo , Kryo 的特点是序列化后的包体积比较小. 能减少网络开销. 
@@ -117,7 +119,7 @@ tmx-rpc-framework
       │  ├─client   - 客户端
       │  ├─codec    - 编解码器
       │  └─server   - 服务端
-      ├─registry    - 注册中心, 默认使用 Zookeeper 实现了服务注册与发现
+      ├─registry    - 注册中心, 使用 Zookeeper or Nacos 实现了服务注册与发现
       ├─serialize   - 序列化组件, 为编解码器提供序列化/反序列化服务
       └─spring      - Spring 相关组件, 主要包括注解扫描, Bean 的扫描与注册等
 ```
@@ -126,7 +128,8 @@ tmx-rpc-framework
 一个优秀的框架应该是灵活可配置的, 下面例举了一部分重要的配置项, 更多配置项可去 `config/ConfigurationEnum.java` 中查看  
 ```
 # 注册中心地址
-rpc.zookeeper.address = 119.23.235.40:2181
+# rpc.zookeeper.address = 127.0.0.1:2181
+rpc.nacos.address = 127.0.0.1:8848
 
 # Zookeeper 根目录
 rpc.zookeeper.rootPath = /tmx-rpc
@@ -175,5 +178,6 @@ rpc.serializer = Protostuff
   - 魔数: 4 个字节, 用来服务端筛选有效报文
   - 序列化框架编号: 与客户端商量好序列化方式
   - 消息体长度
+- [x] 适配 Nacos 作为注册中心
 - [ ] ......  
 
