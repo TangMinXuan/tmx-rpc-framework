@@ -16,6 +16,8 @@ public enum ConfigurationEnum {
 
     // Zookeeper 地址
     ZK_ADDRESS("rpc.zookeeper.address", "127.0.0.1:2181"),
+    // Nacos 地址
+    NACOS_ADDRESS("rpc.nacos.address", "127.0.0.1:8848"),
     // 整个系统的根目录
     ZK_ROOT_PATH("rpc.zookeeper.rootPath", "/tmx-rpc"),
     // 连接重试间隔(单位: 毫秒)

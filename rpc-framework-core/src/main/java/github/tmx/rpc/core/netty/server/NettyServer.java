@@ -38,7 +38,9 @@ public class NettyServer {
 
     private NettyServer() {
         // 注册中心
-        serviceRegistry = ExtensionLoader.getExtensionLoader(ServiceRegistry.class).getExtension("Zookeeper");
+//        serviceRegistry = ExtensionLoader.getExtensionLoader(ServiceRegistry.class).getExtension("Zookeeper");
+        serviceRegistry = ExtensionLoader.getExtensionLoader(ServiceRegistry.class).getExtension("Nacos");
+
         // 容器
         serviceContainer = ExtensionLoader.getExtensionLoader(ServiceContainer.class).getExtension("Spring");
 

@@ -177,7 +177,3 @@ rpc.serializer = Protostuff
   - 消息体长度
 - [ ] ......  
 
-### 欢迎联系
-**Email:** hacfun741950370@gmail.com  
-_欢迎各种 pull request , 我将尽快处理_  
-_欢迎各种 issue , 有问必答_

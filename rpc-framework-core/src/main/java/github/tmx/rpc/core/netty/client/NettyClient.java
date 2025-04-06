@@ -49,7 +49,8 @@ public class NettyClient implements RpcClient {
 
     private NettyClient() {
         channelCacheMap = new ConcurrentHashMap<>();
-        serviceDiscovery = ExtensionLoader.getExtensionLoader(ServiceDiscovery.class).getExtension("Zookeeper");
+//        serviceDiscovery = ExtensionLoader.getExtensionLoader(ServiceDiscovery.class).getExtension("Zookeeper");
+        serviceDiscovery = ExtensionLoader.getExtensionLoader(ServiceDiscovery.class).getExtension("Nacos");
         EventLoopGroup eventLoopGroup = new NioEventLoopGroup();
         bootstrap = new Bootstrap();
 
